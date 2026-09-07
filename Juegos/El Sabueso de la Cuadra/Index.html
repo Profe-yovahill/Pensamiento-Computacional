@@ -1,0 +1,2499 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El Sabueso de la Cuadra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg-1: #322a63;
+    --bg-2: #16122f;
+    --bubble: #fbf9ff;
+    --bubble-ink: #241d3d;
+    --ink: #f4f1ff;
+    --ink-soft: #c7bfec;
+    --ink-faint: #9086bd;
+    --pill: #241f4d;
+    --pill-border: #3c3576;
+    --accent-red: #ef5757;
+    --accent-red-ink: #3c0d0d;
+    --accent-green: #33c79a;
+    --accent-green-ink: #06251c;
+    --pink: #f6c3d6;
+    --pink-ink: #5c2438;
+    --lavender: #d7c6f7;
+    --lavender-ink: #3a2760;
+    --blue: #bfe1f2;
+    --blue-ink: #1c3c4c;
+    --mint: #c7ecd9;
+    --mint-ink: #1c4536;
+    --shadow: 0 2px 0 rgba(0,0,0,0.15), 0 14px 30px -14px rgba(0,0,0,0.55);
+    --board-frame: #efe9fb;
+    --board-line: #241d3d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(1100px 620px at 12% -10%, rgba(255,255,255,0.10), transparent 60%),
+                linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 68%, var(--bg-2) 100%);
+    color: var(--ink);
+    font-family: "Nunito", ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  .display { font-family: "Fredoka", ui-rounded, system-ui, sans-serif; text-wrap: balance; }
+  a { color: inherit; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 26px 20px 60px; }
+
+  /* ---------- Header pills ---------- */
+  .hero-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+  .title-pill {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--pill); border: 1px solid var(--pill-border);
+    border-radius: 20px; padding: 12px 22px 12px 16px;
+    box-shadow: var(--shadow);
+  }
+  .title-pill .rec {
+    position: absolute; top: 10px; right: 14px;
+    width: 9px; height: 9px; border-radius: 999px; background: var(--accent-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) { .title-pill .rec { animation: none; } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .title-pill h1 { font-size: clamp(22px, 4vw, 30px); margin: 0; color: #fbf9ff; letter-spacing: 0.01em; }
+  .title-pill .emoji { font-size: 26px; }
+
+  .case-counter-pill {
+    background: var(--pill); border: 1px solid var(--pill-border);
+    border-radius: 999px; padding: 9px 16px; font-size: 12.5px; color: var(--ink-soft);
+    font-weight: 700; letter-spacing: 0.03em;
+  }
+
+  .stack-pills { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; margin-bottom: 18px; }
+  .info-pill {
+    background: var(--pill); border: 1px solid var(--pill-border);
+    border-radius: 14px; padding: 10px 18px; box-shadow: var(--shadow);
+  }
+  .info-pill .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-faint); font-weight: 700; }
+  .info-pill .v { font-size: 16px; font-weight: 700; color: var(--ink); font-family: "Fredoka", sans-serif; }
+
+  /* ---------- Dificultad progresiva (panel de progreso, sin niveles a elegir) ---------- */
+  .progress-row { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .progress-bar { height: 10px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--accent-green); border-radius: 999px; transition: width .3s ease; }
+
+  /* ---------- Speech bubbles (instructions) ---------- */
+  .bubbles-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 880px) { .bubbles-row { grid-template-columns: 1fr; } }
+  .bubble-card {
+    position: relative;
+    background: var(--bubble); color: var(--bubble-ink);
+    border-radius: 20px; padding: 18px 18px 16px 40px;
+    box-shadow: var(--shadow);
+    font-size: 13.5px;
+  }
+  .bubble-card .num {
+    position: absolute; top: -10px; left: -10px;
+    width: 30px; height: 30px; border-radius: 999px;
+    background: var(--pill); color: #fff; border: 3px solid var(--bg-2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 14px;
+  }
+  .bubble-card h3 { font-family: "Fredoka", sans-serif; font-size: 14.5px; margin: 0 0 6px; }
+  .bubble-card p { margin: 0; color: #4a4270; }
+  .bubble-card .mini-grid {
+    display: grid; grid-template-columns: repeat(3, 22px); grid-template-rows: repeat(3, 22px);
+    gap: 2px; margin: 10px auto 4px; width: max-content;
+  }
+  .bubble-card .mg-cell {
+    background: #ece6fb; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px;
+  }
+  .bubble-card .mg-cell.on { background: var(--lavender); }
+  .bubble-card .mg-cell.blocked { background: #f4d7de; color: #b23b57; font-weight: 800; }
+  .bubble-card .mg-cell.maybe { background: var(--mint); color: var(--mint-ink); font-weight: 800; }
+  .mini-caption { text-align: center; font-size: 11px; color: #7a7299; margin-top: 2px; }
+
+  .legend-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+  .legend-pill {
+    display: flex; align-items: center; gap: 10px;
+    border-radius: 16px; padding: 10px 16px; box-shadow: var(--shadow);
+  }
+  .legend-pill.ok { background: var(--mint); color: var(--mint-ink); }
+  .legend-pill.no { background: var(--pink); color: var(--pink-ink); }
+  .legend-pill .lp-title { font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 13px; margin-right: 4px; }
+  .legend-swatch {
+    background: rgba(255,255,255,0.65); border-radius: 10px;
+    width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 17px;
+  }
+
+  /* ---------- Layout ---------- */
+  .layout { display: grid; grid-template-columns: 340px minmax(0,1fr); gap: 22px; align-items: start; }
+  @media (max-width: 940px) { .layout { grid-template-columns: 1fr; } }
+
+  /* ---------- Roster (photo + bubble) ---------- */
+  .roster-card { display: flex; flex-direction: column; gap: 12px; }
+  .roster-title { font-family: "Fredoka", sans-serif; font-size: 18px; color: var(--ink); margin: 0 0 2px; }
+  .roster-list { display: flex; flex-direction: column; gap: 14px; max-height: 640px; overflow-y: auto; padding: 4px 6px 4px 2px; }
+  .suspect-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: transparent; border: none; padding: 0; cursor: pointer; text-align: left; width: 100%; font: inherit; color: inherit;
+  }
+  .polaroid {
+    flex: none; width: 58px;
+    background: #fff; border-radius: 10px; padding: 5px 5px 16px;
+    box-shadow: var(--shadow);
+    transform: rotate(-2deg);
+    position: relative;
+  }
+  .suspect-row:nth-child(even) .polaroid { transform: rotate(2deg); }
+  .polaroid .photo {
+    width: 100%; aspect-ratio: 1; border-radius: 6px;
+    overflow: hidden; display: block; background: var(--pill);
+  }
+  .polaroid .photo svg { display: block; width: 100%; height: 100%; }
+  .polaroid .name-tag {
+    position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%) rotate(-1deg);
+    background: #fff; border: 1px solid #e4dff5; border-radius: 999px;
+    padding: 1px 7px; font-size: 9px; font-weight: 800; color: var(--bubble-ink);
+    white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+  }
+  .clue-bubble {
+    position: relative; flex: 1; min-width: 0;
+    border-radius: 14px; padding: 9px 12px; font-size: 12.5px;
+    box-shadow: var(--shadow); color: var(--bubble-ink);
+  }
+  .clue-bubble::before {
+    content: ""; position: absolute; left: -5px; top: 16px;
+    width: 12px; height: 12px; background: inherit; transform: rotate(45deg);
+    border-radius: 2px;
+  }
+  .clue-bubble .cb-name { font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+  .clue-bubble .cb-tick { font-size: 12px; }
+  .suspect-row.selected .clue-bubble { outline: 3px solid var(--pill); outline-offset: 1px; }
+  .suspect-row.correct .clue-bubble { outline: 3px solid var(--accent-green); outline-offset: 1px; }
+  .suspect-row.locked { cursor: default; }
+
+  /* ---------- Board ---------- */
+  .board-card { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .board-toolbar { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px; flex-wrap: wrap; }
+  .board-toolbar h2 { font-family: "Fredoka", sans-serif; font-size: 20px; margin: 0; color: var(--ink); }
+  .status-pill { font-size: 12.5px; background: var(--pill); border: 1px solid var(--pill-border); border-radius: 999px; padding: 7px 14px; color: var(--ink-soft); }
+
+  .board-frame {
+    background: var(--board-frame); border-radius: 16px; padding: 14px;
+    box-shadow: var(--shadow); width: min(600px, 100%);
+  }
+  #board {
+    display: grid;
+    background: var(--board-line);
+    border-radius: 10px;
+    padding: 2px; gap: 0;
+    aspect-ratio: 1;
+    position: relative;
+  }
+  .cell {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(12px, 2.6vw, 20px);
+    border-style: solid; border-color: var(--board-line);
+    user-select: none; overflow: visible;
+  }
+  .cell.significant { cursor: pointer; }
+  .cell.significant:focus-visible { outline: 3px solid var(--pill); outline-offset: -3px; z-index: 3; }
+  .cell .room-tag {
+    position: absolute; top: -9px; left: 3px; z-index: 4;
+    background: #fff; color: var(--bubble-ink); border: 1.5px solid var(--board-line);
+    border-radius: 999px; padding: 1px 6px;
+    font-family: "Fredoka", sans-serif; font-size: 6.6px; font-weight: 600; letter-spacing: 0.02em;
+    text-transform: uppercase; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  }
+  .cell .furniture-icon {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 84%; height: 84%; z-index: 1; pointer-events: none;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.18));
+  }
+  .cell .furniture-icon svg { display: block; width: 100%; height: 100%; }
+  .cell .avatar {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 64%; height: 64%; border-radius: 999px;
+    overflow: hidden; display: block; z-index: 2;
+    color: #fff; font-weight: 700; font-size: 0.62em;
+    box-shadow: 0 0 0 2px #fff, 0 2px 4px rgba(0,0,0,0.35);
+    font-family: "Fredoka", sans-serif;
+  }
+  .cell .avatar svg { display: block; width: 100%; height: 100%; }
+  .cell.victim-reveal .avatar { display: flex; align-items: center; justify-content: center; }
+  .cell.correct .avatar { box-shadow: 0 0 0 3px var(--accent-green), 0 2px 4px rgba(0,0,0,0.35); }
+  .cell.wrong .avatar { box-shadow: 0 0 0 3px var(--accent-red), 0 2px 4px rgba(0,0,0,0.35); }
+  .cell.victim-reveal .avatar { background: var(--pill) !important; box-shadow: 0 0 0 3px var(--accent-red); }
+
+  .cell.blocked { cursor: not-allowed; }
+  .cell.blocked .furniture-icon { opacity: 0.4; filter: grayscale(0.5) drop-shadow(0 2px 2px rgba(0,0,0,0.18)); }
+  .cell .blocked-mark {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    font-size: clamp(16px, 4vw, 30px); font-weight: 800; color: var(--accent-red);
+    z-index: 3; pointer-events: none; text-shadow: 0 1px 0 rgba(255,255,255,0.55);
+  }
+  .board-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-soft); }
+  .board-legend span.dot { display: inline-block; width: 9px; height: 9px; border-radius: 999px; margin-right: 5px; vertical-align: middle; }
+
+  /* ---------- Controls / stats ---------- */
+  .side-card { background: var(--pill); border: 1px solid var(--pill-border); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+  .side-card > h2 { display: flex; align-items: center; gap: 6px; }
+  .side-card-foot { margin-top: auto; padding-top: 10px; }
+  .stat-readout { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin-bottom: 12px; }
+  .stat-readout .stat { display: flex; flex-direction: column; gap: 1px; }
+  .stat-readout .label { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); }
+  .stat-readout .value { font-family: "Fredoka", sans-serif; font-size: 18px; font-weight: 600; color: #f2c078; }
+  .stat-readout .value.ok { color: var(--accent-green); }
+
+  /* ---------- Tarjetas de la ventana de reglas: en dos columnas para
+     aprovechar el ancho en pantallas grandes, en una sola en pantallas
+     angostas. ---------- */
+  .side-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: stretch; margin-bottom: 18px; }
+  .side-grid > .side-card { margin: 0; }
+  .side-grid > .side-card.span-2 { grid-column: 1 / -1; }
+  @media (max-width: 820px) { .side-grid { grid-template-columns: 1fr; } }
+
+  .btn-row { display: flex; flex-direction: column; gap: 9px; }
+  button {
+    font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 14.5px;
+    border-radius: 12px; padding: 10px 16px; border: 1px solid transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform .08s ease, filter .15s ease, opacity .15s ease;
+  }
+  button:active { transform: translateY(1px); }
+  button:focus-visible { outline: 3px solid var(--accent-green); outline-offset: 2px; }
+  button.primary { background: var(--accent-red); color: #fff; box-shadow: var(--shadow); }
+  button.primary:hover { filter: brightness(1.08); }
+  button.secondary { background: rgba(255,255,255,0.08); color: var(--ink); border-color: var(--pill-border); }
+  button.secondary:hover { background: rgba(255,255,255,0.14); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .hint-note { font-size: 11.5px; color: var(--ink-faint); text-align: center; }
+
+  /* ---------- Accuse / verdict ---------- */
+  .accuse-card { display: none; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .accuse-card.ready { display: flex; }
+  .accuse-card h3 { margin: 0; font-size: 15.5px; font-family: "Fredoka", sans-serif; }
+  .accuse-note { font-size: 12.5px; color: var(--ink-soft); }
+  .accuse-answer-bar {
+    background: var(--bg-2); border: 2px dashed var(--pill-border);
+    border-radius: 999px; padding: 10px 16px; font-size: 13px; color: var(--ink-faint);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .accuse-options { display: flex; flex-direction: column; gap: 6px; }
+  .accuse-btn { background: var(--bubble); color: var(--bubble-ink); justify-content: flex-start; font-weight: 700; }
+  .accuse-btn:hover { filter: brightness(0.97); }
+
+  .verdict {
+    display: none; text-align: center; border-radius: 16px; padding: 16px; margin-top: 14px;
+    background: var(--pink); color: var(--pink-ink);
+  }
+  .verdict.show { display: block; animation: stampin .35s ease; }
+  .verdict.win { background: var(--mint); color: var(--mint-ink); }
+  @keyframes stampin { from { transform: scale(1.25) rotate(-5deg); opacity: 0; } to { transform: scale(1) rotate(-1deg); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .verdict.show { animation: none; } }
+  .verdict .stamp { font-family: "Fredoka", sans-serif; font-size: 22px; font-weight: 700; display: inline-block; transform: rotate(-1deg); }
+  .verdict p { margin: 8px 0 0; font-size: 13px; }
+
+  footer { text-align: center; padding: 28px 20px 10px; color: var(--ink-faint); font-size: 12.5px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+  /* ---------- Registro / puntajes ---------- */
+  .text-input {
+    flex: 1; min-width: 160px; border-radius: 12px; border: 1px solid var(--pill-border);
+    background: var(--bg-2); color: var(--ink); padding: 10px 14px;
+    font-family: "Nunito", sans-serif; font-size: 14px;
+  }
+  .text-input:focus-visible { outline: 3px solid var(--accent-green); outline-offset: 1px; }
+  .lb-row { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 10px; font-size: 13px; }
+  .lb-row:nth-child(odd) { background: rgba(255,255,255,0.05); }
+  .lb-row .lb-rank { width: 26px; font-family: "Fredoka", sans-serif; font-weight: 700; color: var(--ink-faint); }
+  .lb-row .lb-name { flex: 1; font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-row .lb-level { font-size: 11px; color: var(--ink-faint); text-transform: capitalize; }
+  .lb-row .lb-score { font-family: "Fredoka", sans-serif; font-weight: 700; color: #f2c078; min-width: 52px; text-align: right; }
+  .lb-row .lb-time { font-family: "Fredoka", sans-serif; font-weight: 700; color: #7fc4ee; min-width: 52px; text-align: right; }
+
+  /* ---------- Herramientas del profesor / avisos ---------- */
+  .teacher-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .teacher-row .secondary { font-size: 12.5px; padding: 8px 12px; }
+  .file-input-label {
+    display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+    border: 1px solid var(--pill-border); background: var(--pill); color: var(--ink);
+    border-radius: 999px; padding: 8px 12px; font-size: 12.5px; font-weight: 700;
+  }
+
+  /* ---------- Overlays compartidos (confirmación / tutorial) ---------- */
+  .confirm-overlay, .tutorial-overlay {
+    position: fixed; inset: 0; background: rgba(8,6,20,0.72);
+    display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50;
+  }
+  .confirm-overlay[hidden], .tutorial-overlay[hidden] { display: none; }
+  .confirm-card, .tutorial-card {
+    background: var(--pill); border: 1px solid var(--pill-border); border-radius: 18px;
+    box-shadow: var(--shadow); padding: 22px 24px; max-width: 460px; width: 100%;
+  }
+  .confirm-card h3 { font-family: "Fredoka", sans-serif; font-size: 16px; margin: 0 0 8px; }
+  .confirm-card p { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+  .tutorial-card h4 { font-family: "Fredoka", sans-serif; font-size: 17px; margin: 0 0 8px; }
+  .tutorial-card p { margin: 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+  .tutorial-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .tutorial-skip { font-size: 12px; color: var(--ink-faint); display: flex; align-items: center; gap: 6px; }
+
+  /* ---------- Explicación de la solución ---------- */
+  .solve-explain { margin-top: 12px; font-size: 12.5px; }
+  .solve-explain h4 { font-family: "Fredoka", sans-serif; font-size: 14px; margin: 0 0 6px; }
+  .solve-explain ol { margin: 6px 0 0; padding-left: 20px; }
+  .solve-explain li { margin-bottom: 6px; line-height: 1.4; }
+
+  /* ---------- Modo proyector: agranda el tablero/lista para explicar en clase ---------- */
+  #game-section.projector-mode { zoom: 1.3; }
+
+  /* ---------- Sección del tablero (mismo documento, se muestra/oculta) ---------- */
+  #game-section { margin-top: 26px; }
+  #game-section[hidden] { display: none; }
+  #config-section[hidden] { display: none; }
+
+  /* ---------- Logros ---------- */
+  .badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .badge-chip {
+    display: flex; align-items: center; gap: 8px; border-radius: 12px; padding: 8px 10px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--pill-border); font-size: 12px;
+  }
+  .badge-chip .b-icon { font-size: 20px; filter: grayscale(1); opacity: 0.35; }
+  .badge-chip.earned { background: rgba(199,236,217,0.12); border-color: var(--mint); }
+  .badge-chip.earned .b-icon { filter: none; opacity: 1; }
+  .badge-chip .b-label { font-weight: 700; color: var(--ink); line-height: 1.25; }
+  .badge-chip .b-desc { font-size: 10.5px; color: var(--ink-faint); display: block; }
+
+  /* ---------- Estadísticas de clase ---------- */
+  .stat-mini-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
+  .stat-mini { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 12px; text-align: center; }
+  .stat-mini .sm-num { font-family: "Fredoka", sans-serif; font-size: 20px; font-weight: 700; color: var(--ink); display: block; }
+  .stat-mini .sm-label { font-size: 10.5px; color: var(--ink-faint); }
+
+  /* ---------- Accesibilidad ---------- */
+  body.high-contrast {
+    --bg-1: #000000; --bg-2: #000000; --ink: #ffffff; --ink-soft: #ffffff; --ink-faint: #e6e6e6;
+    --pill: #101010; --pill-border: #ffffff; --bubble: #ffffff; --bubble-ink: #000000;
+    --board-frame: #101010; --board-line: #ffffff;
+  }
+  body.high-contrast .side-card, body.high-contrast .bubble-card { border-width: 2px; }
+  body.high-contrast button.secondary { border-width: 2px; }
+  html.font-grande body { font-size: 17px; }
+  html.font-muy-grande body { font-size: 19px; }
+
+  /* ---------- Modo impresión (jugar en papel) ---------- */
+  #print-area { display: none; }
+  @media print {
+    .wrap > *:not(#print-area) { display: none !important; }
+    .confirm-overlay, .tutorial-overlay { display: none !important; }
+    #print-area { display: block !important; position: static; width: 100%; color: #000; background: #fff; padding: 10px; }
+    #print-area h2 { font-family: "Fredoka", sans-serif; }
+    #print-area .print-grid { display: grid; gap: 2px; border: 2px solid #000; width: fit-content; margin: 10px 0; }
+    #print-area .print-cell { width: 34px; height: 34px; border: 1px solid #888; display: flex; align-items: center; justify-content: center; font-size: 15px; box-sizing: border-box; }
+    #print-area ol { padding-left: 20px; }
+    #print-area li { margin-bottom: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="hero-top">
+    <div class="title-pill">
+      <span class="emoji">🕵🏽</span>
+      <h1 class="display">El Sabueso de la Cuadra</h1>
+      <span class="rec" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <div id="config-section">
+  <div class="bubbles-row">
+    <div class="bubble-card">
+      <span class="num">1</span>
+      <h3>¡Alguien fue asesinado!</h3>
+      <p id="bubble-victim">¿Puedes descubrir quién fue? Lee la pista de cada sospechoso y encuentra su ubicación exacta en la escena. El asesino estaba a solas con la víctima, en la misma habitación.</p>
+    </div>
+    <div class="bubble-card">
+      <span class="num">2</span>
+      <h3>Regla: uno por fila y columna</h3>
+      <p>Cada persona ocupa una sola casilla. Ninguna otra persona puede compartir su fila ni su columna.</p>
+      <div class="mini-grid" aria-hidden="true">
+        <div class="mg-cell on">🙂</div><div class="mg-cell blocked">✕</div><div class="mg-cell blocked">✕</div>
+        <div class="mg-cell blocked">✕</div><div class="mg-cell"></div><div class="mg-cell"></div>
+        <div class="mg-cell blocked">✕</div><div class="mg-cell"></div><div class="mg-cell"></div>
+      </div>
+      <div class="mini-caption">bloquea toda su fila y columna</div>
+    </div>
+    <div class="bubble-card">
+      <span class="num">3</span>
+      <h3>El objeto es una pista, no el lugar</h3>
+      <p>Nadie está parado sobre su mueble. La persona está a un lado: arriba, abajo, izquierda o derecha de él (no en diagonal).</p>
+      <div class="mini-grid" aria-hidden="true">
+        <div class="mg-cell"></div><div class="mg-cell maybe">✓</div><div class="mg-cell"></div>
+        <div class="mg-cell maybe">✓</div><div class="mg-cell on">🪟</div><div class="mg-cell maybe">✓</div>
+        <div class="mg-cell"></div><div class="mg-cell maybe">✓</div><div class="mg-cell"></div>
+      </div>
+      <div class="mini-caption">el mueble es la pista; la persona está junto a él</div>
+    </div>
+  </div>
+
+  <div class="legend-row">
+    <div class="legend-pill ok">
+      <div class="legend-swatch">🪟</div>
+      <div><div class="lp-title">Casillas con objeto</div>son la pista, nadie se para ahí</div>
+    </div>
+    <div class="legend-pill ok">
+      <div class="legend-swatch">▢</div>
+      <div><div class="lp-title">Piso junto al objeto</div>tú eliges en cuál de esas casillas ubicar al sospechoso</div>
+    </div>
+  </div>
+
+  <div class="side-grid">
+  <div class="side-card" id="player-card">
+    <h2 style="font-family:'Fredoka',sans-serif;font-size:17px;margin:0 0 4px;color:var(--ink);">👤 Jugador</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;" id="player-status">Escribe tu nombre y regístrate para guardar tus puntajes en el top 10.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <input type="text" id="player-name-input" class="text-input" placeholder="Tu nombre" maxlength="24">
+      <button class="secondary" id="btn-register" type="button">💾 Guardar nombre</button>
+    </div>
+  </div>
+
+  <div class="side-card" id="accessibility-card">
+    <h2 style="font-family:'Fredoka',sans-serif;font-size:17px;margin:0 0 4px;color:var(--ink);">♿ Accesibilidad</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;">Ajustes para leer y jugar más cómodo.</p>
+    <div class="teacher-row">
+      <label class="file-input-label" style="cursor:pointer;">
+        <input type="checkbox" id="chk-high-contrast" style="margin:0;"> 🌓 Alto contraste
+      </label>
+    </div>
+    <div class="teacher-row" style="margin-top:10px;align-items:center;">
+      <span style="font-size:12.5px;color:var(--ink-soft);">🔤 Tamaño del texto:</span>
+      <button class="secondary" type="button" id="btn-font-normal" style="font-size:12px;padding:6px 10px;">Normal</button>
+      <button class="secondary" type="button" id="btn-font-grande" style="font-size:12px;padding:6px 10px;">Grande</button>
+      <button class="secondary" type="button" id="btn-font-muy-grande" style="font-size:12px;padding:6px 10px;">Muy grande</button>
+    </div>
+  </div>
+
+  <div class="side-card" id="launch-card">
+    <h2 style="font-family:'Fredoka',sans-serif;font-size:17px;margin:0 0 4px;color:var(--ink);">🎮 Empieza a jugar</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 14px;">No eliges dificultad: el juego arranca con 6 personajes y te va sumando uno más cada 5 casos que resuelvas, hasta un máximo de 15. El tablero se abre más abajo, en esta misma página.</p>
+    <div id="progress-display" style="margin-bottom:14px;"></div>
+    <div class="btn-row" style="margin-top:2px;">
+      <button class="primary" id="btn-open-game" type="button">🎮 Empezar a jugar</button>
+    </div>
+    <p class="hint-note" id="game-window-status" style="margin-top:10px;">Toca el botón para empezar tu próximo caso.</p>
+    <p class="hint-note side-card-foot">🏆 10 puntos por cada personaje del tablero, −10 por cada pista usada, −5 por cada error de ubicación. Tu puntaje total suma todos los casos que juegues.</p>
+  </div>
+
+  <div class="side-card" id="achievements-card">
+    <h2 style="font-family:'Fredoka',sans-serif;font-size:17px;margin:0 0 4px;color:var(--ink);">🏅 Tus logros</h2>
+    <p style="font-size:11.5px;color:var(--ink-faint);margin:0 0 10px;" id="achievements-sub">Regístrate y resuelve casos para ir desbloqueando logros.</p>
+    <div class="badge-grid" id="achievements-list"></div>
+  </div>
+
+  <div class="side-card" id="leaderboard-card">
+    <h2 style="font-family:'Fredoka',sans-serif;font-size:17px;margin:0 0 4px;color:var(--ink);">🏆 Top 10 puntajes</h2>
+    <p style="font-size:11.5px;color:var(--ink-faint);margin:0 0 10px;">Suma el puntaje de todos los casos que ha resuelto cada jugador — entre más casos juegues, más sube tu puntaje total.</p>
+    <div id="leaderboard-list"></div>
+    <p class="side-card-foot" style="font-size:11px;color:var(--ink-faint);margin:0;">Se guarda solo en este computador y navegador.</p>
+  </div>
+
+  <div class="side-card" id="leaderboard-time-card">
+    <h2 style="font-family:'Fredoka',sans-serif;font-size:17px;margin:0 0 4px;color:var(--ink);">⏱️ Top 10 más rápidos</h2>
+    <p style="font-size:11.5px;color:var(--ink-faint);margin:0 0 10px;">Primero manda la dificultad (difícil va más arriba); entre casos de la misma dificultad, gana el tiempo más corto.</p>
+    <div id="leaderboard-time-list"></div>
+  </div>
+
+  <div class="side-card span-2" id="class-stats-card">
+    <h2 style="font-family:'Fredoka',sans-serif;font-size:17px;margin:0 0 4px;color:var(--ink);">📊 Estadísticas de la clase</h2>
+    <p style="font-size:11.5px;color:var(--ink-faint);margin:0 0 10px;">Resumen de todas las partidas guardadas en este computador (útil para cerrar la clase con el grupo).</p>
+    <div class="stat-mini-grid" id="class-stats-grid"></div>
+  </div>
+
+  <div class="side-card span-2" id="teacher-card">
+    <h2 style="font-family:'Fredoka',sans-serif;font-size:17px;margin:0 0 4px;color:var(--ink);">🧑‍🏫 Herramientas del profesor</h2>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;">El marcador vive solo en este computador y navegador. Si juegas en varios computadores del salón, exporta el respaldo de cada uno y luego impórtalos todos en uno solo para armar el Top 10 del curso completo.</p>
+    <div class="teacher-row">
+      <button class="secondary" id="btn-export-scores-csv" type="button">⬇️ CSV puntajes</button>
+      <button class="secondary" id="btn-export-time-csv" type="button">⬇️ CSV tiempos</button>
+      <button class="secondary" id="btn-export-backup" type="button">💾 Exportar respaldo (JSON)</button>
+      <label class="file-input-label" for="import-backup-input">📤 Importar respaldo (JSON)</label>
+      <input type="file" id="import-backup-input" accept="application/json" hidden>
+      <button class="secondary" id="btn-print-case" type="button">🖨️ Imprimir para jugar en papel</button>
+    </div>
+    <p style="font-size:11px;color:var(--ink-faint);margin:10px 0 0;" id="teacher-import-status"></p>
+    <div class="teacher-row" style="margin-top:12px;">
+      <label class="file-input-label" style="cursor:pointer;">
+        <input type="checkbox" id="chk-projector-mode" style="margin:0;"> 🔎 Modo proyector (agranda el tablero)
+      </label>
+      <button class="secondary" id="btn-reset-scores" type="button" style="border-color:var(--accent-red);color:#ffb3b3;">🗑️ Reiniciar marcador</button>
+    </div>
+  </div>
+  </div>
+  </div>
+
+  <div id="print-area"></div>
+
+  <section id="game-section" style="max-width:1000px;margin:26px auto 0;" hidden>
+    <div class="hero-top">
+      <div class="title-pill">
+        <span class="emoji">🕵🏽</span>
+        <h1 class="display" style="font-size:20px;">Resuelve el caso</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <button type="button" class="secondary" id="btn-back-config" title="Volver a las reglas y la configuración">⬅️ Volver a la configuración</button>
+        <button type="button" class="secondary" id="btn-help" title="Ver el tutorial de nuevo">❓ Ayuda</button>
+        <div class="case-counter-pill" id="case-counter">CASO N.º 001</div>
+      </div>
+    </div>
+
+    <div class="stack-pills">
+      <div class="info-pill"><span class="k">Caso</span> <span class="v" id="scenario-title">Cargando…</span></div>
+      <div class="info-pill"><span class="k">Pista</span> <span class="v" id="scenario-sub" style="font-size:13px;">…</span></div>
+      <div class="info-pill"><span class="k">Personajes</span> <span class="v" id="difficulty-label">6 personajes</span></div>
+    </div>
+
+    <div class="layout">
+      <section class="roster-card">
+        <h2 class="roster-title">Sospechosos</h2>
+        <div class="roster-list" id="roster-list"></div>
+
+        <div class="side-card accuse-card" id="accuse-card">
+          <h3>🚨 Acusación</h3>
+          <p class="accuse-note" id="accuse-note"></p>
+          <div class="accuse-answer-bar">El asesino es…</div>
+          <div class="accuse-options" id="accuse-options"></div>
+        </div>
+
+        <div class="verdict" id="verdict">
+          <span class="stamp" id="verdict-stamp">CASO CERRADO</span>
+          <p id="verdict-text"></p>
+          <div class="solve-explain" id="solve-explain"></div>
+        </div>
+      </section>
+
+      <section class="board-card">
+        <div class="board-toolbar">
+          <h2>Escena del caso</h2>
+          <div class="status-pill" id="status-pill">Selecciona un sospechoso y toca una casilla junto a su objeto</div>
+        </div>
+        <div class="board-frame">
+          <div id="board" role="grid" aria-label="Plano de la casa"></div>
+        </div>
+        <div class="board-legend">
+          <span><span class="dot" style="background:var(--accent-green)"></span>Coincide con la pista</span>
+          <span><span class="dot" style="background:var(--accent-red)"></span>No coincide</span>
+          <span>💀 Casilla de la víctima (se revela al completar)</span>
+        </div>
+
+        <div class="side-card" style="width:100%;">
+          <div class="stat-readout">
+            <div class="stat"><span class="label">Ubicados</span><span class="value" id="stat-placed">0 / 0</span></div>
+            <div class="stat"><span class="label">Correctos</span><span class="value ok" id="stat-correct">0</span></div>
+            <div class="stat"><span class="label">Tiempo</span><span class="value" id="stat-time">00:00</span></div>
+            <div class="stat"><span class="label">Movimientos</span><span class="value" id="stat-moves">0</span></div>
+            <div class="stat"><span class="label">Errores</span><span class="value" id="stat-mistakes">0</span></div>
+          </div>
+          <div class="btn-row">
+            <button class="primary" id="btn-new">🗂️ Nuevo caso</button>
+            <button class="secondary" id="btn-hint">🔎 Pista</button>
+            <div class="hint-note" id="hint-count">3 pistas disponibles</div>
+            <button class="secondary" id="btn-undo" disabled>↩️ Deshacer</button>
+            <button class="secondary" id="btn-reset">↺ Reiniciar caso</button>
+          </div>
+        </div>
+        <p class="sr-only" id="live-region" aria-live="polite"></p>
+      </section>
+    </div>
+  </section>
+
+  <div class="tutorial-overlay" id="tutorial-overlay" hidden>
+    <div class="tutorial-card">
+      <div id="tutorial-step-body"></div>
+      <div class="tutorial-nav">
+        <label class="tutorial-skip"><input type="checkbox" id="tutorial-skip-check"> No volver a mostrar</label>
+        <div class="btn-row" style="margin:0;">
+          <button type="button" class="secondary" id="tutorial-prev">Atrás</button>
+          <button type="button" class="primary" id="tutorial-next">Siguiente</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>El Sabueso de la Cuadra · un mini-misterio de pensamiento computacional</footer>
+</div>
+<div class="confirm-overlay" id="confirm-overlay" hidden>
+  <div class="confirm-card">
+    <h3 id="confirm-title">¿Estás seguro?</h3>
+    <p id="confirm-message"></p>
+    <div class="btn-row" style="justify-content:flex-end;margin-top:14px;">
+      <button type="button" class="secondary" id="confirm-cancel">Cancelar</button>
+      <button type="button" class="primary" id="confirm-ok">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ================= DATA ================= */
+  var CHARACTERS = [
+    { name: "Yesenia", color: "#c0392b", avatar: { bg: "#c0392b", shirt: "#7d3f36", skin: "#c98a55", hair: "long", hairColor: "#3b2a1e", glasses: false, facialHair: "none", earrings: true } },
+    { name: "Camilo", color: "#2471a3", avatar: { bg: "#2471a3", shirt: "#274d66", skin: "#e0ab7a", hair: "short", hairColor: "#1c1c1c", glasses: false, facialHair: "none", earrings: false } },
+    { name: "Marleny", color: "#8e44ad", avatar: { bg: "#8e44ad", shirt: "#4a2f5c", skin: "#8a5a34", hair: "curly", hairColor: "#221a15", glasses: false, facialHair: "none", earrings: true } },
+    { name: "Andrés", color: "#1e8449", avatar: { bg: "#1e8449", shirt: "#1c5c3a", skin: "#f0c39a", hair: "short", hairColor: "#4a3222", glasses: true, facialHair: "none", earrings: false } },
+    { name: "Luz Dary", color: "#ca6f1e", avatar: { bg: "#ca6f1e", shirt: "#8a4a17", skin: "#cf9a68", hair: "ponytail", hairColor: "#4a2f1c", glasses: false, facialHair: "none", earrings: false } },
+    { name: "Wílmer", color: "#117864", avatar: { bg: "#117864", shirt: "#0c4f43", skin: "#7a4a28", hair: "buzz", hairColor: "#1c1c1c", glasses: false, facialHair: "mustache", earrings: false } },
+    { name: "Estefanía", color: "#b7950b", avatar: { bg: "#b7950b", shirt: "#7a600c", skin: "#f2caa0", hair: "long", hairColor: "#caa356", glasses: false, facialHair: "none", earrings: true } },
+    { name: "Jhon Fredy", color: "#6c3483", avatar: { bg: "#6c3483", shirt: "#4a2266", skin: "#8a5a34", hair: "afro", hairColor: "#1c1512", glasses: false, facialHair: "none", earrings: false } },
+    { name: "Paola", color: "#a04000", avatar: { bg: "#a04000", shirt: "#6e2c00", skin: "#c98a55", hair: "bob", hairColor: "#241a14", glasses: true, facialHair: "none", earrings: false } },
+    { name: "Duván", color: "#1a5276", avatar: { bg: "#1a5276", shirt: "#0f3550", skin: "#e0ab7a", hair: "mohawk", hairColor: "#1c1c1c", glasses: false, facialHair: "beard", earrings: false } },
+    { name: "Yeimy", color: "#d68910", avatar: { bg: "#d68910", shirt: "#8f5b0a", skin: "#c98a55", hair: "curly", hairColor: "#2a1c12", glasses: false, facialHair: "none", earrings: true } },
+    { name: "Fabián", color: "#229954", avatar: { bg: "#229954", shirt: "#166638", skin: "#f0c39a", hair: "buzz", hairColor: "#2a1c12", glasses: true, facialHair: "beard", earrings: false } },
+    { name: "Nataly", color: "#5b2c6f", avatar: { bg: "#5b2c6f", shirt: "#3b1c49", skin: "#8a5a34", hair: "bob", hairColor: "#1c1512", glasses: false, facialHair: "none", earrings: true } },
+    { name: "Édgar", color: "#1b4f72", avatar: { bg: "#1b4f72", shirt: "#12334c", skin: "#e0ab7a", hair: "short", hairColor: "#3b2a1e", glasses: true, facialHair: "mustache", earrings: false } },
+    { name: "Carolina", color: "#922b21", avatar: { bg: "#922b21", shirt: "#611c16", skin: "#f2caa0", hair: "long", hairColor: "#4a2f1c", glasses: false, facialHair: "none", earrings: true } },
+    { name: "Jairo", color: "#616a6b", avatar: { bg: "#616a6b", shirt: "#40484a", skin: "#7a4a28", hair: "afro", hairColor: "#1c1c1c", glasses: false, facialHair: "none", earrings: false } }
+  ];
+
+  var SCENARIOS = [
+    { title: "Fiesta de quince en el barrio", sub: "La música paró de golpe. Alguien no llegó vivo al brindis." },
+    { title: "Finca cafetera en el Eje", sub: "Entre el olor a café recién trillado, apareció un cuerpo." },
+    { title: "Apartaestudio en Chapinero", sub: "El arriendo se venció… y también alguien más." },
+    { title: "Tienda de la esquina", sub: "Cerraron por inventario. Encontraron algo que no estaba en la lista." },
+    { title: "Asado de fin de semana", sub: "La parrilla seguía prendida cuando llegó la policía." },
+    { title: "Oficina del quinto piso", sub: "Se fueron todos a las seis. Uno se quedó para siempre." },
+    { title: "Casa de la abuela en el pueblo", sub: "Domingo de sancocho… y de un misterio familiar." },
+    { title: "Alquiler por app en la 93", sub: "La reseña de 5 estrellas no va a poder escribirla el huésped." },
+    { title: "Bus intermunicipal varado", sub: "Se dañó a mitad de camino y alguien no bajó en la siguiente parada." },
+    { title: "Cancha de tejo un viernes", sub: "El pólvorazo tapó el grito. Nadie vio nada… o eso dicen." },
+    { title: "Peluquería del centro comercial", sub: "El último turno de la tarde nunca salió por la puerta." },
+    { title: "Reinado de belleza municipal", sub: "Bajaron el telón y una de las candidatas no volvió a los camerinos." },
+    { title: "Consultorio veterinario de barrio", sub: "Cerraron con la última mascota atendida… y una sorpresa que nadie esperaba." },
+    { title: "Bazar navideño del colegio", sub: "Entre villancicos y buñuelos, alguien no llegó a la rifa." }
+  ];
+
+  var ROOM_NAMES = [
+    { name: "Sala", article: "la" },
+    { name: "Cocina", article: "la" },
+    { name: "Comedor", article: "el" },
+    { name: "Dormitorio principal", article: "el" },
+    { name: "Cuarto de invitados", article: "el" },
+    { name: "Baño", article: "el" },
+    { name: "Balcón", article: "el" },
+    { name: "Patio de ropas", article: "el" },
+    { name: "Garaje", article: "el" },
+    { name: "Estudio", article: "el" },
+    { name: "Terraza", article: "la" },
+    { name: "Pasillo", article: "el" },
+    { name: "Cafetería", article: "la" },
+    { name: "Bodega", article: "la" },
+    { name: "Ático", article: "el" },
+    { name: "Jardín", article: "el" },
+    { name: "Vestíbulo", article: "el" },
+    { name: "Recepción", article: "la" }
+  ];
+
+  var FEATURES = [
+    { id: "ventana", icon: "🪟", clue: "Estaba delante de una ventana." },
+    { id: "cama", icon: "🛏️", clue: "Estaba sobre la cama." },
+    { id: "sofa", icon: "🛋️", clue: "Estaba sentado en el sofá." },
+    { id: "planta", icon: "🪴", clue: "Estaba junto a una planta." },
+    { id: "tv", icon: "📺", clue: "Estaba frente al televisor." },
+    { id: "silla", icon: "🪑", clue: "Estaba sentado en una silla." },
+    { id: "espejo", icon: "🪞", clue: "Estaba junto a un espejo." },
+    { id: "lampara", icon: "💡", clue: "Estaba bajo una lámpara." },
+    { id: "mesa", icon: "🍽️", clue: "Estaba en la mesa." },
+    { id: "radio", icon: "📻", clue: "Estaba junto al radio." },
+    { id: "libro", icon: "📚", clue: "Estaba junto a la biblioteca." },
+    { id: "cafe", icon: "☕", clue: "Estaba tomando tinto." },
+    { id: "ducha", icon: "🚿", clue: "Estaba cerca de la ducha." },
+    { id: "cuadro", icon: "🖼️", clue: "Estaba junto a un cuadro." },
+    { id: "chimenea", icon: "🔥", clue: "Estaba junto a la chimenea." },
+    { id: "piano", icon: "🎹", clue: "Estaba tocando el piano." },
+    { id: "maleta", icon: "🧳", clue: "Estaba junto a una maleta." },
+    { id: "guitarra", icon: "🎸", clue: "Estaba con una guitarra." },
+    { id: "sanitario", icon: "🚽", clue: "Estaba junto al sanitario." },
+    { id: "lavadora", icon: "🧺", clue: "Estaba junto a la lavadora." }
+  ];
+
+  // Objetos "neutros" que tienen sentido en casi cualquier cuarto — se usan como
+  // relleno cuando la lista propia del cuarto ya se agotó, para nunca terminar
+  // poniendo algo tan específico como una cama o una ducha donde no encaja.
+  var GENERIC_FEATURES = ["silla", "cuadro", "lampara", "ventana", "espejo", "planta", "libro", "radio", "maleta", "guitarra"];
+
+  // Qué objetos tiene sentido encontrar en cada tipo de cuarto — así el mueble
+  // de la pista siempre coincide con la zona donde aparece (una cafetería tiene
+  // café y mesas, un baño tiene ducha o sanitario, un dormitorio tiene cama...).
+  var ROOM_FEATURE_MAP = {
+    "Sala": ["sofa", "tv", "cuadro", "chimenea", "planta"],
+    "Cocina": ["mesa", "cafe", "radio", "silla"],
+    "Comedor": ["mesa", "silla", "cuadro"],
+    "Dormitorio principal": ["cama", "lampara", "espejo"],
+    "Cuarto de invitados": ["cama", "maleta", "lampara"],
+    "Baño": ["ducha", "sanitario", "espejo"],
+    "Balcón": ["planta", "silla", "guitarra"],
+    "Patio de ropas": ["lavadora", "silla"],
+    "Garaje": ["maleta", "radio"],
+    "Estudio": ["libro", "piano", "lampara"],
+    "Terraza": ["planta", "silla", "guitarra"],
+    "Pasillo": ["planta", "cuadro", "ventana"],
+    "Cafetería": ["cafe", "mesa", "silla"],
+    "Bodega": ["maleta", "libro", "radio"],
+    "Ático": ["maleta", "libro", "espejo"],
+    "Jardín": ["planta", "silla", "guitarra"],
+    "Vestíbulo": ["espejo", "cuadro", "lampara", "ventana"],
+    "Recepción": ["silla", "cuadro", "radio", "ventana"]
+  };
+
+  // El tablero tiene tantas filas y columnas como personajes (K). El número de
+  // cuartos es K-1: uno para el asesino (que comparte el cuarto del crimen con
+  // la víctima) y uno por cada sospechoso restante — así ningún cuarto se queda
+  // sin nadie ("una persona por lugar").
+  // Dificultad progresiva ÚNICA (no hay niveles para elegir): el juego
+  // arranca con baseK personajes y, por cada "step" casos RESUELTOS en
+  // total (sin importar cuántas personas tenía cada tablero), suma un
+  // personaje más — hasta un máximo de maxK. Al llegar al máximo, se sigue
+  // jugando indefinidamente en tableros de maxK personajes, siempre
+  // pudiendo mejorar el puntaje. Ver resolveProgress().
+  var PROGRESSION = { baseK: 6, step: 5, maxK: 15, pointsPerPerson: 10 };
+
+  var HINT_LIMIT = 3;
+
+  /* ================= PUNTAJES (localStorage, local a este navegador) =================
+     El juego es un solo archivo HTML sin servidor, así que el registro y el
+     top 10 se guardan en el localStorage de este navegador/computador —
+     no se comparten con otros equipos. */
+  var SCORES_KEY = "sabueso_scores_v1";
+  var PLAYER_KEY = "sabueso_player_name_v1";
+  var HINT_PENALTY = 10;
+  var MISTAKE_PENALTY = 5;
+
+  // Cuántos personajes tenía el tablero de un registro de puntaje — los
+  // registros nuevos guardan "people" directamente; los de una versión
+  // anterior del juego (con niveles fácil/medio/difícil) no lo tienen, así
+  // que se les asigna un valor aproximado para no romper el Top 10 por
+  // tiempo ni las estadísticas.
+  var LEGACY_LEVEL_PEOPLE = { facil: 6, medio: 8, dificil: 10 };
+  function peopleOf(r) {
+    if (typeof r.people === "number") return r.people;
+    return LEGACY_LEVEL_PEOPLE[r.level] || PROGRESSION.baseK;
+  }
+
+  function getPlayerName() {
+    try { return localStorage.getItem(PLAYER_KEY) || ""; } catch (e) { return ""; }
+  }
+  function setPlayerName(name) {
+    try { localStorage.setItem(PLAYER_KEY, name); } catch (e) { /* almacenamiento no disponible */ }
+  }
+  function loadScores() {
+    try {
+      var raw = localStorage.getItem(SCORES_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function saveScoreRecord(record) {
+    var scores = loadScores();
+    scores.push(record);
+    try { localStorage.setItem(SCORES_KEY, JSON.stringify(scores)); } catch (e) { /* almacenamiento no disponible */ }
+    renderLeaderboard();
+    renderTimeLeaderboard();
+    renderAchievements();
+    renderClassStats();
+    updateProgressDisplay();
+  }
+  function escapeHTML(s) {
+    var d = document.createElement("div");
+    d.textContent = String(s);
+    return d.innerHTML;
+  }
+
+  // El Top 10 de puntajes premia jugar varios casos: suma el puntaje de
+  // TODAS las partidas guardadas de cada jugador (por nombre), no solo su
+  // mejor partida individual. Así, si alguien saca 70 + 100 + 50 en tres
+  // casos distintos, su lugar en la tabla se calcula sobre 220.
+  function aggregateTotals() {
+    var byName = {};
+    var order = [];
+    loadScores().forEach(function (r) {
+      if (!r || !r.name) return;
+      if (!byName[r.name]) { byName[r.name] = { name: r.name, total: 0, games: 0 }; order.push(r.name); }
+      byName[r.name].total += r.score;
+      byName[r.name].games += 1;
+    });
+    return order.map(function (n) { return byName[n]; }).sort(function (a, b) { return b.total - a.total; });
+  }
+
+  // Cuántos casos ha RESUELTO (acierto) este jugador en total — es la base
+  // de la dificultad progresiva (ya no hay niveles separados).
+  function countSolved(name) {
+    return loadScores().filter(function (r) { return r.name === name; }).length;
+  }
+
+  // Calcula, para un jugador, cuántos personajes tiene el tablero ahora
+  // mismo (base + 1 por cada "step" casos resueltos, con tope en maxK), y
+  // cuántos casos le faltan para el próximo personaje.
+  function resolveProgress(name) {
+    var count = countSolved(name);
+    var K = Math.min(PROGRESSION.baseK + Math.floor(count / PROGRESSION.step), PROGRESSION.maxK);
+    var maxed = K >= PROGRESSION.maxK;
+    var casesToNext = maxed ? 0 : (PROGRESSION.step - (count % PROGRESSION.step));
+    return {
+      K: K, rows: K, cols: K, numRooms: K - 1,
+      baseScore: K * PROGRESSION.pointsPerPerson,
+      count: count, maxed: maxed, casesToNext: casesToNext
+    };
+  }
+
+  function renderLeaderboard() {
+    var list = document.getElementById("leaderboard-list");
+    if (!list) return;
+    var top = aggregateTotals().slice(0, 10);
+    if (top.length === 0) {
+      list.innerHTML = '<p style="color:var(--ink-faint);font-size:12.5px;margin:0;">Aún no hay puntajes registrados. ¡Sé el primero en resolver un caso!</p>';
+      return;
+    }
+    list.innerHTML = "";
+    top.forEach(function (rec, i) {
+      var row = document.createElement("div");
+      row.className = "lb-row";
+      row.innerHTML =
+        '<span class="lb-rank">#' + (i + 1) + '</span>' +
+        '<span class="lb-name">' + escapeHTML(rec.name) + '</span>' +
+        '<span class="lb-level">' + rec.games + (rec.games === 1 ? " partida" : " partidas") + '</span>' +
+        '<span class="lb-score">' + rec.total + ' pts</span>';
+      list.appendChild(row);
+    });
+  }
+
+  function renderTimeLeaderboard() {
+    var list = document.getElementById("leaderboard-time-list");
+    if (!list) return;
+    // Primero manda cuántos personajes tenía el tablero (más personajes =
+    // más difícil, pesa más), y entre casos con el mismo número de
+    // personajes, gana el tiempo más corto.
+    var top = loadScores().slice().sort(function (a, b) {
+      var pa = peopleOf(a), pb = peopleOf(b);
+      if (pb !== pa) return pb - pa;
+      return (a.seconds || 0) - (b.seconds || 0);
+    }).slice(0, 10);
+    if (top.length === 0) {
+      list.innerHTML = '<p style="color:var(--ink-faint);font-size:12.5px;margin:0;">Aún no hay tiempos registrados. ¡Sé el primero en resolver un caso!</p>';
+      return;
+    }
+    list.innerHTML = "";
+    top.forEach(function (rec, i) {
+      var row = document.createElement("div");
+      row.className = "lb-row";
+      row.innerHTML =
+        '<span class="lb-rank">#' + (i + 1) + '</span>' +
+        '<span class="lb-name">' + escapeHTML(rec.name) + '</span>' +
+        '<span class="lb-level">' + peopleOf(rec) + ' pers.</span>' +
+        '<span class="lb-time">' + formatTime(rec.seconds || 0) + '</span>';
+      list.appendChild(row);
+    });
+  }
+
+  function updatePlayerUI() {
+    var name = getPlayerName();
+    var statusEl = document.getElementById("player-status");
+    var input = document.getElementById("player-name-input");
+    if (statusEl) {
+      statusEl.textContent = name
+        ? "🟢 Jugando como " + name + ". Tus puntajes se guardan en este computador."
+        : "Escribe tu nombre y regístrate para guardar tus puntajes en el top 10.";
+    }
+    if (input && document.activeElement !== input) input.value = name;
+    renderAchievements();
+  }
+
+  /* ================= LOGROS =================
+     Se calculan a partir de las partidas GANADAS que ya están guardadas
+     (loadScores) para el nombre registrado — no hace falta guardar nada
+     aparte. Como solo se guarda un registro cuando el caso se resuelve
+     correctamente, cada logro mira ese historial de aciertos. */
+  var ACHIEVEMENTS = [
+    { id: "sin-pistas", icon: "🎯", label: "Sin pistas", desc: "Resolviste un caso sin usar ninguna pista.",
+      test: function (recs) { return recs.some(function (r) { return r.hintsUsed === 0; }); } },
+    { id: "perfecto", icon: "✅", label: "Perfecto", desc: "Resolviste un caso sin errores ni pistas.",
+      test: function (recs) { return recs.some(function (r) { return r.hintsUsed === 0 && r.mistakes === 0; }); } },
+    { id: "crece", icon: "📈", label: "Va subiendo", desc: "Resolviste un caso con 10 personajes o más en el tablero.",
+      test: function (recs) { return recs.some(function (r) { return peopleOf(r) >= 10; }); } },
+    { id: "tablero-maximo", icon: "🏔️", label: "Tablero máximo", desc: "Llegaste al tope de " + PROGRESSION.maxK + " personajes.",
+      test: function (recs) { return recs.some(function (r) { return peopleOf(r) >= PROGRESSION.maxK; }); } },
+    { id: "rapido", icon: "⚡", label: "Rápido", desc: "Resolviste un caso en menos de 90 segundos.",
+      test: function (recs) { return recs.some(function (r) { return (r.seconds || 0) > 0 && r.seconds < 90; }); } },
+    { id: "diez-casos", icon: "🏆", label: "Diez casos", desc: "Jugaste 10 partidas o más.",
+      test: function (recs) { return recs.length >= 10; } }
+  ];
+  function renderAchievements() {
+    var list = document.getElementById("achievements-list");
+    var sub = document.getElementById("achievements-sub");
+    if (!list) return;
+    var name = getPlayerName();
+    if (!name) {
+      list.innerHTML = "";
+      if (sub) sub.textContent = "Regístrate y resuelve casos para ir desbloqueando logros.";
+      return;
+    }
+    var recs = loadScores().filter(function (r) { return r.name === name; });
+    if (sub) sub.textContent = recs.length ? "Logros de " + name + ":" : "Aún no tienes partidas registradas, " + name + ". ¡Resuelve tu primer caso!";
+    list.innerHTML = "";
+    ACHIEVEMENTS.forEach(function (a) {
+      var earned = a.test(recs);
+      var chip = document.createElement("div");
+      chip.className = "badge-chip" + (earned ? " earned" : "");
+      chip.innerHTML = '<span class="b-icon">' + a.icon + '</span><span><span class="b-label">' + escapeHTML(a.label) +
+        '</span><span class="b-desc">' + escapeHTML(a.desc) + '</span></span>';
+      list.appendChild(chip);
+    });
+  }
+
+  /* ================= ESTADÍSTICAS DE LA CLASE =================
+     Agrega TODAS las partidas guardadas (de todos los jugadores) para dar
+     una foto general útil al cerrar la clase. */
+  function computeClassStats() {
+    var recs = loadScores();
+    var stats = { total: recs.length, avgHints: 0, avgMistakes: 0, avgTime: 0, avgPeople: 0, maxPeopleReached: 0 };
+    if (!recs.length) return stats;
+    var sumHints = 0, sumMistakes = 0, sumTime = 0, sumPeople = 0, maxPeople = 0;
+    recs.forEach(function (r) {
+      sumHints += r.hintsUsed || 0;
+      sumMistakes += r.mistakes || 0;
+      sumTime += r.seconds || 0;
+      var p = peopleOf(r);
+      sumPeople += p;
+      if (p > maxPeople) maxPeople = p;
+    });
+    stats.avgHints = sumHints / recs.length;
+    stats.avgMistakes = sumMistakes / recs.length;
+    stats.avgTime = sumTime / recs.length;
+    stats.avgPeople = sumPeople / recs.length;
+    stats.maxPeopleReached = maxPeople;
+    return stats;
+  }
+  function renderClassStats() {
+    var grid = document.getElementById("class-stats-grid");
+    if (!grid) return;
+    var s = computeClassStats();
+    var cells = [
+      { num: s.total, label: "Casos resueltos en total" },
+      { num: s.total ? s.avgMistakes.toFixed(1) : "—", label: "Errores promedio por caso" },
+      { num: s.total ? s.avgHints.toFixed(1) : "—", label: "Pistas promedio por caso" },
+      { num: s.total ? formatTime(Math.round(s.avgTime)) : "—", label: "Tiempo promedio" },
+      { num: s.total ? s.avgPeople.toFixed(1) : "—", label: "Personajes promedio por caso" },
+      { num: s.total ? s.maxPeopleReached : "—", label: "Tablero más grande alcanzado" }
+    ];
+    grid.innerHTML = "";
+    cells.forEach(function (c) {
+      var el = document.createElement("div");
+      el.className = "stat-mini";
+      el.innerHTML = '<span class="sm-num">' + c.num + '</span><span class="sm-label">' + escapeHTML(c.label) + '</span>';
+      grid.appendChild(el);
+    });
+  }
+
+  // Modal de confirmación genérico, reutiliza el overlay #confirm-overlay
+  // de esta página (se pasa siempre "document"; el parámetro se conserva
+  // por si algún día hace falta un overlay en otro documento).
+  function showConfirm(doc, title, message, onConfirm) {
+    var overlay = doc.getElementById("confirm-overlay");
+    if (!overlay) { if (onConfirm) onConfirm(); return; }
+    doc.getElementById("confirm-title").textContent = title;
+    doc.getElementById("confirm-message").textContent = message;
+    overlay.hidden = false;
+    var okBtn = doc.getElementById("confirm-ok");
+    var cancelBtn = doc.getElementById("confirm-cancel");
+    // Clonamos los botones para descartar cualquier listener de una
+    // confirmación anterior (el overlay se reutiliza entre llamadas).
+    var newOk = okBtn.cloneNode(true); okBtn.parentNode.replaceChild(newOk, okBtn);
+    var newCancel = cancelBtn.cloneNode(true); cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+    function close() { overlay.hidden = true; }
+    newOk.addEventListener("click", function () { close(); if (onConfirm) onConfirm(); });
+    newCancel.addEventListener("click", close);
+  }
+
+  /* ================= HERRAMIENTAS DEL PROFESOR ================= */
+  function csvEscape(v) {
+    var s = String(v == null ? "" : v);
+    if (/[",\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function downloadTextFile(filename, mime, content) {
+    var blob = new Blob([content], { type: mime });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+  function sortedScores(kind) {
+    var rows = loadScores().slice();
+    if (kind === "time") {
+      rows.sort(function (a, b) {
+        var pa = peopleOf(a), pb = peopleOf(b);
+        if (pb !== pa) return pb - pa;
+        return (a.seconds || 0) - (b.seconds || 0);
+      });
+    } else {
+      rows.sort(function (a, b) { return b.score - a.score; });
+    }
+    return rows;
+  }
+  function exportScoresCSV(kind) {
+    var lines;
+    if (kind === "time") {
+      var rows = sortedScores("time");
+      var header = ["puesto", "nombre", "puntaje", "personajes", "pistas_usadas", "errores", "movimientos", "tiempo", "fecha"];
+      lines = [header.join(",")];
+      rows.forEach(function (r, i) {
+        lines.push([
+          i + 1, csvEscape(r.name), r.score, peopleOf(r), r.hintsUsed, r.mistakes, r.moves,
+          formatTime(r.seconds || 0), csvEscape(r.date)
+        ].join(","));
+      });
+    } else {
+      // Puntajes: exporta el total acumulado por jugador (suma de todas sus
+      // partidas), igual a lo que muestra el Top 10 puntajes en pantalla.
+      var totals = aggregateTotals();
+      var header2 = ["puesto", "nombre", "puntaje_total", "partidas_jugadas"];
+      lines = [header2.join(",")];
+      totals.forEach(function (r, i) {
+        lines.push([i + 1, csvEscape(r.name), r.total, r.games].join(","));
+      });
+    }
+    var name = kind === "time" ? "sabueso_top10_tiempos.csv" : "sabueso_top10_puntajes.csv";
+    downloadTextFile(name, "text/csv;charset=utf-8", lines.join("\n"));
+  }
+  function exportScoresBackup() {
+    var payload = { app: "sabueso-de-la-cuadra", exportedAt: new Date().toISOString(), scores: loadScores() };
+    downloadTextFile("sabueso_respaldo_" + Date.now() + ".json", "application/json", JSON.stringify(payload, null, 2));
+  }
+  function importScoresBackup(file) {
+    var statusEl = document.getElementById("teacher-import-status");
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var data = JSON.parse(String(reader.result));
+        var incoming = Array.isArray(data) ? data : (data && Array.isArray(data.scores) ? data.scores : null);
+        if (!incoming) throw new Error("formato inesperado");
+        var existing = loadScores();
+        var seen = {};
+        existing.forEach(function (r) { seen[r.name + "|" + r.date + "|" + r.score + "|" + r.seconds] = true; });
+        var added = 0;
+        incoming.forEach(function (r) {
+          if (!r || typeof r.score !== "number" || !r.name) return;
+          var key = r.name + "|" + r.date + "|" + r.score + "|" + r.seconds;
+          if (seen[key]) return;
+          seen[key] = true;
+          existing.push(r);
+          added++;
+        });
+        try { localStorage.setItem(SCORES_KEY, JSON.stringify(existing)); } catch (e) {}
+        renderLeaderboard();
+        renderTimeLeaderboard();
+        renderAchievements();
+        renderClassStats();
+        updateProgressDisplay();
+        if (statusEl) statusEl.textContent = added > 0
+          ? ("✅ Se agregaron " + added + " puntaje" + (added === 1 ? "" : "s") + " nuevo" + (added === 1 ? "" : "s") + " al marcador de este computador.")
+          : "No había puntajes nuevos en ese archivo (ya estaban todos aquí).";
+      } catch (e) {
+        if (statusEl) statusEl.textContent = "⚠️ No se pudo leer ese archivo. Usa un respaldo exportado desde este mismo juego (💾 Exportar respaldo).";
+      }
+    };
+    reader.readAsText(file);
+  }
+  function resetScores() {
+    showConfirm(document, "Reiniciar el marcador", "Esto borra los dos Top 10 guardados en este computador y navegador. No se puede deshacer — si quieres conservarlos, expórtalos primero.", function () {
+      try { localStorage.removeItem(SCORES_KEY); } catch (e) {}
+      renderLeaderboard();
+      renderTimeLeaderboard();
+      renderAchievements();
+      renderClassStats();
+      updateProgressDisplay();
+      var statusEl = document.getElementById("teacher-import-status");
+      if (statusEl) statusEl.textContent = "El marcador de este computador quedó en blanco.";
+    });
+  }
+  function setProjectorMode(on) {
+    state.projectorMode = on;
+    if (gameWrap) gameWrap.classList.toggle("projector-mode", on);
+  }
+
+  /* ================= ACCESIBILIDAD =================
+     Alto contraste y tamaño de texto, persistidos en este navegador y
+     aplicados a todo el documento (funcionan igual en la configuración
+     y en el tablero, ya que ahora comparten la misma página). */
+  var HIGH_CONTRAST_KEY = "sabueso_high_contrast_v1";
+  var FONT_SIZE_KEY = "sabueso_font_size_v1";
+  function loadHighContrast() {
+    try { return localStorage.getItem(HIGH_CONTRAST_KEY) === "1"; } catch (e) { return false; }
+  }
+  function setHighContrast(on) {
+    document.body.classList.toggle("high-contrast", on);
+    try { localStorage.setItem(HIGH_CONTRAST_KEY, on ? "1" : "0"); } catch (e) {}
+  }
+  function loadFontSize() {
+    try { return localStorage.getItem(FONT_SIZE_KEY) || "normal"; } catch (e) { return "normal"; }
+  }
+  function setFontSize(size) {
+    var root = document.documentElement;
+    root.classList.remove("font-grande", "font-muy-grande");
+    if (size === "grande") root.classList.add("font-grande");
+    if (size === "muy-grande") root.classList.add("font-muy-grande");
+    try { localStorage.setItem(FONT_SIZE_KEY, size); } catch (e) {}
+    ["btn-font-normal", "btn-font-grande", "btn-font-muy-grande"].forEach(function (id) {
+      var b = document.getElementById(id);
+      if (b) b.classList.toggle("primary", id === "btn-font-" + size);
+    });
+  }
+
+  /* ================= MODO IMPRESIÓN (jugar en papel) =================
+     Genera una versión de solo lectura del caso actual (o uno nuevo, si no
+     hay ninguno abierto) pensada para imprimir: el tablero con los cuartos
+     y los muebles, SIN los sospechosos ubicados, más la lista de pistas —
+     así los estudiantes pueden resolverlo a mano, con lápiz y papel.
+     window.print() usa la hoja @media print definida arriba. */
+  function printCurrentCase() {
+    var kase = state.kase;
+    if (!kase) { newCase(true); kase = state.kase; }
+    if (!kase) return;
+    var area = document.getElementById("print-area");
+    var victimName = CHARACTERS[kase.victimCharIdx].name;
+    var victimRoom = kase.roomMeta[kase.regionOf[kase.victimCell]];
+    var featureIcon = {};
+    FEATURES.forEach(function (f) { featureIcon[f.id] = f.icon; });
+    var landmarkAt = {};
+    kase.suspects.forEach(function (sus) { landmarkAt[sus.landmarkCell] = sus.featureId; });
+    var cellsHTML = "";
+    for (var i = 0; i < kase.rows * kase.cols; i++) {
+      var icon = i === kase.victimCell ? "💀" : (landmarkAt[i] ? (featureIcon[landmarkAt[i]] || "▢") : "");
+      cellsHTML += '<div class="print-cell">' + icon + '</div>';
+    }
+    var cluesHTML = kase.suspects.map(function (sus) {
+      var ch = CHARACTERS[sus.charIdx];
+      return "<li><strong>" + escapeHTML(ch.name) + ":</strong> " + escapeHTML(sus.clue) + "</li>";
+    }).join("");
+    area.innerHTML =
+      '<h2>🕵️ El Sabueso de la Cuadra — ' + escapeHTML(kase.scenario.title) + '</h2>' +
+      '<p>' + escapeHTML(kase.scenario.sub) + '</p>' +
+      '<p><strong>' + escapeHTML(victimName) + '</strong> apareció sin vida en ' + victimRoom.article + ' ' + victimRoom.name.toLowerCase() +
+      ' (💀). Cada casilla con un objeto (▢) marca la pista de un sospechoso: la persona estaba justo al lado, no encima. ' +
+      'Ninguna otra persona puede compartir su fila ni su columna. ¿Quién es el/la culpable?</p>' +
+      '<div class="print-grid" style="grid-template-columns:repeat(' + kase.cols + ',36px);">' + cellsHTML + '</div>' +
+      '<h3>Sospechosos y pistas</h3><ol>' + cluesHTML + '</ol>';
+    window.print();
+  }
+
+  /* ================= TUTORIAL ================= */
+  var TUTORIAL_SEEN_KEY = "sabueso_tutorial_seen_v1";
+  var TUTORIAL_STEPS = [
+    { title: "1. Elige un sospechoso", body: "Toca a un sospechoso en la lista de la izquierda para seleccionarlo. Su pista te dice junto a qué mueble estaba parado." },
+    { title: "2. Ubícalo junto a su pista", body: "Toca una casilla libre justo al lado del mueble (arriba, abajo, izquierda o derecha — no en diagonal). No hace falta acertar una única casilla: cualquiera de las libres alrededor del mueble sirve." },
+    { title: "3. Una persona por fila y columna", body: "Ninguna otra persona puede compartir la fila ni la columna de alguien ya ubicado. Esas casillas quedan marcadas con una ✕." },
+    { title: "4. Las pistas y los errores cuestan puntos", body: "Cada caso empieza en 60, 80 o 100 puntos según la dificultad. Cada pista que uses resta 10, y cada vez que ubiques a alguien en una casilla equivocada (o choques con otra fila/columna) restan 5. Tu puntaje total suma todos los casos que juegues — ¡entre más juegues, más subes en el Top 10! Si te equivocas, el botón ↩️ Deshacer regresa tu último movimiento." },
+    { title: "5. Acusa al culpable", body: "Cuando todos estén bien ubicados, aparece el botón de acusación. Fíjate quién quedó en la misma habitación que la víctima y acúsalo." }
+  ];
+  var tutorialStepIdx = 0;
+  function renderTutorialStep() {
+    var step = TUTORIAL_STEPS[tutorialStepIdx];
+    var body = document.getElementById("tutorial-step-body");
+    body.innerHTML = "<h4>" + escapeHTML(step.title) + "</h4><p>" + escapeHTML(step.body) + "</p>";
+    document.getElementById("tutorial-prev").disabled = tutorialStepIdx === 0;
+    document.getElementById("tutorial-next").textContent = tutorialStepIdx === TUTORIAL_STEPS.length - 1 ? "Entendido" : "Siguiente";
+  }
+  function openTutorial() {
+    tutorialStepIdx = 0;
+    renderTutorialStep();
+    var overlay = document.getElementById("tutorial-overlay");
+    var skip = document.getElementById("tutorial-skip-check");
+    if (skip) skip.checked = false;
+    if (overlay) overlay.hidden = false;
+  }
+  function closeTutorial() {
+    var overlay = document.getElementById("tutorial-overlay");
+    if (overlay) overlay.hidden = true;
+    var skip = document.getElementById("tutorial-skip-check");
+    if (skip && skip.checked) { try { localStorage.setItem(TUTORIAL_SEEN_KEY, "1"); } catch (e) {} }
+  }
+  function maybeShowTutorial() {
+    var seen;
+    try { seen = localStorage.getItem(TUTORIAL_SEEN_KEY); } catch (e) { seen = null; }
+    if (!seen) openTutorial();
+  }
+
+  /* ================= GENERATOR ================= */
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function pickN(arr, n) { return shuffle(arr.slice()).slice(0, n); }
+
+  function neighbors4(idx, rows, cols) {
+    var r = Math.floor(idx / cols), c = idx % cols;
+    var res = [];
+    if (r > 0) res.push(idx - cols);
+    if (r < rows - 1) res.push(idx + cols);
+    if (c > 0) res.push(idx - 1);
+    if (c < cols - 1) res.push(idx + 1);
+    return res;
+  }
+
+  function buildFloorPlan(rows, cols, numRooms) {
+    var total = rows * cols;
+    var regionOf = new Array(total).fill(-1);
+    var allCells = shuffle([...Array(total).keys()]);
+    var seeds = allCells.slice(0, numRooms);
+    seeds.forEach(function (idx, i) { regionOf[idx] = i; });
+
+    var victimRoom = 0;
+    var vSeed = seeds[victimRoom];
+    var vNbrs = shuffle(neighbors4(vSeed, rows, cols)).filter(function (nb) { return regionOf[nb] === -1; });
+    if (vNbrs.length === 0) return null;
+    regionOf[vNbrs[0]] = victimRoom;
+
+    // El cuarto del crimen necesita una tercera casilla libre: la víctima y el
+    // asesino ya ocupan las otras dos, así que sin esta no habría dónde poner
+    // el objeto-pista del asesino (regla "un solo objeto por cuarto").
+    var thirdSeen = {}; thirdSeen[vSeed] = true; thirdSeen[vNbrs[0]] = true;
+    var thirdCandidates = shuffle(
+      neighbors4(vSeed, rows, cols).concat(neighbors4(vNbrs[0], rows, cols))
+        .filter(function (nb) { return regionOf[nb] === -1 && !thirdSeen[nb]; })
+    );
+    if (thirdCandidates.length === 0) return null;
+    var vThird = thirdCandidates[0];
+    regionOf[vThird] = victimRoom;
+    var closedRooms = { 0: true };
+
+    var frontiers = seeds.map(function (idx, i) { return i === victimRoom ? [vSeed, vNbrs[0], vThird] : [idx]; });
+    var remaining = total - numRooms - 2;
+    var guard = 0;
+    while (remaining > 0 && guard < total * 30) {
+      guard++;
+      var order = shuffle([...Array(numRooms).keys()]).filter(function (r) { return !closedRooms[r]; });
+      var progress = false;
+      for (var oi = 0; oi < order.length; oi++) {
+        var region = order[oi];
+        var frontier = frontiers[region];
+        for (var attempt = 0; attempt < frontier.length; attempt++) {
+          var pos = Math.floor(Math.random() * frontier.length);
+          var cellIdx = frontier[pos];
+          var nbrs = shuffle(neighbors4(cellIdx, rows, cols)).filter(function (nb) { return regionOf[nb] === -1; });
+          if (nbrs.length > 0) {
+            var chosen = nbrs[0];
+            regionOf[chosen] = region;
+            frontier.push(chosen);
+            remaining--;
+            progress = true;
+            break;
+          } else {
+            frontier.splice(pos, 1);
+            attempt--;
+            if (frontier.length === 0) break;
+          }
+        }
+        if (remaining === 0) break;
+      }
+      if (!progress) break;
+    }
+    if (remaining > 0) {
+      var changed = true;
+      var guard2 = 0;
+      while (remaining > 0 && changed && guard2 < total * 10) {
+        guard2++;
+        changed = false;
+        for (var idx = 0; idx < total; idx++) {
+          if (regionOf[idx] !== -1) continue;
+          var nbrs2 = neighbors4(idx, rows, cols).filter(function (nb) { return regionOf[nb] !== -1 && !closedRooms[regionOf[nb]]; });
+          if (nbrs2.length > 0) {
+            var reg = regionOf[nbrs2[Math.floor(Math.random() * nbrs2.length)]];
+            regionOf[idx] = reg;
+            remaining--; changed = true;
+          }
+        }
+      }
+    }
+    if (remaining > 0) return null;
+    return { regionOf: regionOf, victimRoom: victimRoom, victimCells: [vSeed, vNbrs[0]], numRooms: numRooms };
+  }
+
+  // Recibe un cfg ya resuelto por resolveProgress() — rows/cols/numRooms
+  // ya incluyen los personajes extra que el jugador se haya ganado.
+  function generateCase(cfg) {
+    var rows = cfg.rows, cols = cfg.cols, numRooms = cfg.numRooms, K = cfg.K;
+    var plan = null;
+    for (var attempt = 0; attempt < 60 && !plan; attempt++) plan = buildFloorPlan(rows, cols, numRooms);
+    if (!plan) return null;
+
+    var regionOf = plan.regionOf, victimCells = plan.victimCells;
+    var total = rows * cols;
+    var vc = shuffle(victimCells.slice());
+    var victimCell = vc[0], killerCell = vc[1];
+
+    var roomNamesPool = pickN(ROOM_NAMES, numRooms);
+    var roomMeta = {};
+    for (var r = 0; r < numRooms; r++) roomMeta[r] = roomNamesPool[r];
+
+    // Regla "una persona por lugar" + "una persona por fila y columna": cada
+    // cuarto (incluido el del crimen, donde ya está el asesino) debe tener
+    // exactamente un sospechoso — así ningún cuarto queda vacío — y ninguno
+    // puede compartir fila ni columna con otro. Recorremos cuarto por cuarto y
+    // elegimos, dentro de cada uno, una casilla cuya fila y columna sigan
+    // libres.
+    var kRow = Math.floor(killerCell / cols), kCol = killerCell % cols;
+    var usedRows = {}; usedRows[kRow] = true;
+    var usedCols = {}; usedCols[kCol] = true;
+    var otherRooms = shuffle([...Array(numRooms).keys()].filter(function (r) { return r !== plan.victimRoom; }));
+    var extraSignificant = [];
+    var roomMatchOk = true;
+    for (var ori = 0; ori < otherRooms.length; ori++) {
+      var roomIdx = otherRooms[ori];
+      var roomCells = [];
+      for (var ci = 0; ci < total; ci++) {
+        if (regionOf[ci] !== roomIdx) continue;
+        var cr = Math.floor(ci / cols), cc = ci % cols;
+        if (usedRows[cr] || usedCols[cc]) continue;
+        roomCells.push(ci);
+      }
+      if (roomCells.length === 0) { roomMatchOk = false; break; }
+      var chosenCell = roomCells[Math.floor(Math.random() * roomCells.length)];
+      usedRows[Math.floor(chosenCell / cols)] = true;
+      usedCols[chosenCell % cols] = true;
+      extraSignificant.push(chosenCell);
+    }
+    if (!roomMatchOk) return null;
+
+    var significantNonVictim = [killerCell].concat(extraSignificant);
+    var allSignificant = [victimCell].concat(significantNonVictim);
+
+    // Regla "el objeto es una referencia": el sospechoso NUNCA está parado sobre
+    // su mueble/objeto — el mueble se dibuja en una casilla vecina (arriba, abajo,
+    // izquierda o derecha) de donde estuvo realmente. Buscamos, para cada
+    // sospechoso, una casilla libre adyacente para el mueble, SIEMPRE dentro de
+    // su mismo cuarto (nunca "al otro lado de la pared" — así cada cuarto tiene
+    // un único objeto, ni más ni menos). Si no hay una casilla libre de su
+    // propio cuarto junto a él, este intento de caso no sirve y se descarta.
+    var reserved = {};
+    allSignificant.forEach(function (c) { reserved[c] = true; });
+    var needsLandmark = significantNonVictim.slice();
+    var landmarkOf = {};
+    var landmarkOk = true;
+    needsLandmark.forEach(function (standCell) {
+      if (!landmarkOk) return;
+      var nbrs = neighbors4(standCell, rows, cols);
+      var sameRoom = shuffle(nbrs.filter(function (n) { return regionOf[n] === regionOf[standCell] && !reserved[n]; }));
+      if (sameRoom.length === 0) { landmarkOk = false; return; }
+      var chosen = sameRoom[0];
+      landmarkOf[standCell] = chosen;
+      reserved[chosen] = true;
+    });
+    if (!landmarkOk) return null;
+
+    // El objeto de cada pista debe encajar con el cuarto donde aparece (café en
+    // la cafetería, ducha en el baño, cama en el dormitorio...). Buscamos primero
+    // en la lista de objetos propios de ese tipo de cuarto; si ya se usaron todos
+    // (poco común), tomamos cualquier objeto libre para no trabar la partida.
+    var allFeatureIds = FEATURES.map(function (f) { return f.id; });
+    var usedFeatures = {};
+    var featureOf = {};
+    needsLandmark.forEach(function (standCell) {
+      var landmarkCell = landmarkOf[standCell];
+      var roomIdx = regionOf[landmarkCell];
+      var roomName = roomMeta[roomIdx] ? roomMeta[roomIdx].name : null;
+      var specific = (roomName && ROOM_FEATURE_MAP[roomName]) || [];
+      var pick = shuffle(specific.filter(function (f) { return !usedFeatures[f]; }))[0];
+      if (!pick) {
+        pick = shuffle(GENERIC_FEATURES.filter(function (f) { return !usedFeatures[f]; }))[0];
+      }
+      if (!pick) {
+        pick = shuffle(allFeatureIds.filter(function (f) { return !usedFeatures[f]; }))[0];
+      }
+      featureOf[standCell] = pick;
+      usedFeatures[pick] = true;
+    });
+
+    // Los muebles quedan reservados: nadie puede pararse encima de otro objeto.
+    // Un solo objeto por cuarto/área — el mueble-pista de su único sospechoso —
+    // el resto del cuarto queda como piso libre, sin llenarlo de cosas.
+    var landmarkCellsSet = {};
+    Object.keys(landmarkOf).forEach(function (k) { landmarkCellsSet[landmarkOf[k]] = true; });
+
+    var chosenChars = pickN(CHARACTERS.map(function (c, idx) { return idx; }), K);
+    var victimCharIdx = chosenChars[0];
+    var suspectCharIdx = chosenChars.slice(1);
+    var suspectCells = shuffle(significantNonVictim.slice());
+    var suspects = suspectCharIdx.map(function (charIdx, i) {
+      var seedCell = suspectCells[i];
+      var isKiller = seedCell === killerCell;
+      var featureId = featureOf[seedCell];
+      var landmarkCell = landmarkOf[seedCell];
+      var featureObj = FEATURES.filter(function (f) { return f.id === featureId; })[0];
+      var clueText = featureObj.clue;
+      var candidateCells;
+
+      if (isKiller) {
+        // El asesino no puede elegir: solo cabe en la única casilla libre del
+        // cuarto del crimen, junto a la víctima.
+        candidateCells = [seedCell];
+      } else {
+        // Regla "coloca a la persona donde quieras": cualquier casilla libre
+        // alrededor del mueble sirve, siempre que no choque en fila/columna
+        // con otro sospechoso (esa parte se valida al jugar, en vivo).
+        var nbrs = neighbors4(landmarkCell, rows, cols);
+        candidateCells = nbrs.filter(function (n) {
+          return n !== victimCell && n !== killerCell && !landmarkCellsSet[n];
+        });
+        if (candidateCells.indexOf(seedCell) === -1) candidateCells.push(seedCell);
+      }
+
+      return {
+        charIdx: charIdx, correctCell: seedCell, candidateCells: candidateCells,
+        landmarkCell: landmarkCell, featureId: featureId,
+        clue: clueText, isKiller: isKiller, placedCell: null
+      };
+    });
+
+    var standCandidatesSet = {};
+    suspects.forEach(function (s) { s.candidateCells.forEach(function (c) { standCandidatesSet[c] = true; }); });
+    var standCandidates = Object.keys(standCandidatesSet).map(Number);
+
+    var scenario = SCENARIOS[Math.floor(Math.random() * SCENARIOS.length)];
+
+    return {
+      rows: rows, cols: cols, numRooms: numRooms, K: K,
+      baseScore: K * PROGRESSION.pointsPerPerson,
+      regionOf: regionOf, roomMeta: roomMeta,
+      victimCell: victimCell, victimCharIdx: victimCharIdx,
+      significantNonVictim: significantNonVictim, standCandidates: standCandidates,
+      suspects: suspects, scenario: scenario
+    };
+  }
+
+  /* ================= ROOM VISUALS ================= */
+  var ROOM_BASE = ["#e4dcf6", "#d3ecdf", "#f3e3c9", "#d6e6f3", "#f4dbe4", "#dcead2", "#e7e2d9", "#d8c9b0"];
+  var ROOM_STRIPE = ["#d2c5ef", "#b9dfcb", "#e9d19f", "#bcd7ee", "#eec0d0", "#c5dcb7", "#d3cabb", "#c3ac8a"];
+  var STRIPE_ANGLES = [0, 45, 90, 135];
+  function roomBackground(roomIdx) {
+    var base = ROOM_BASE[roomIdx % ROOM_BASE.length];
+    var stripe = ROOM_STRIPE[roomIdx % ROOM_STRIPE.length];
+    var pattern = roomIdx % 5;
+    if (pattern === 4) return base;
+    var angle = STRIPE_ANGLES[pattern];
+    return "repeating-linear-gradient(" + angle + "deg, " + base + " 0px 13px, " + stripe + " 13px 15px)";
+  }
+
+  /* ================= AVATAR PORTRAITS ================= */
+  function circlePath(cx, cy, r) {
+    return "M " + cx + " " + (cy - r) + " A " + r + " " + r + " 0 1 0 " + cx + " " + (cy + r) +
+      " A " + r + " " + r + " 0 1 0 " + cx + " " + (cy - r) + " Z ";
+  }
+
+  var HAIR_SHAPES = {
+    short: function (c) {
+      return '<path d="M24 38 Q24 8 50 8 Q76 8 76 38 L69 35 Q69 16 50 16 Q31 16 31 35 Z" fill="' + c + '"/>';
+    },
+    buzz: function (c) {
+      return '<path d="M25 34 Q25 18 50 18 Q75 18 75 34 Q75 25 50 23 Q25 25 25 34 Z" fill="' + c + '" opacity="0.55"/>';
+    },
+    long: function (c) {
+      return HAIR_SHAPES.short(c) +
+        '<path d="M20 40 Q17 68 24 92 L35 92 Q28 64 31 38 Z" fill="' + c + '"/>' +
+        '<path d="M80 40 Q83 68 76 92 L65 92 Q72 64 69 38 Z" fill="' + c + '"/>';
+    },
+    bob: function (c) {
+      return HAIR_SHAPES.short(c) +
+        '<path d="M22 38 Q19 54 25 65 L36 65 Q30 50 32 38 Z" fill="' + c + '"/>' +
+        '<path d="M78 38 Q81 54 75 65 L64 65 Q70 50 68 38 Z" fill="' + c + '"/>';
+    },
+    curly: function (c) {
+      return '<circle cx="27" cy="26" r="8" fill="' + c + '"/><circle cx="40" cy="15" r="9" fill="' + c + '"/>' +
+        '<circle cx="53" cy="12" r="9.5" fill="' + c + '"/><circle cx="66" cy="15" r="9" fill="' + c + '"/>' +
+        '<circle cx="76" cy="27" r="8" fill="' + c + '"/><circle cx="23" cy="38" r="6.5" fill="' + c + '"/>' +
+        '<circle cx="77" cy="38" r="6.5" fill="' + c + '"/>';
+    },
+    ponytail: function (c) {
+      return HAIR_SHAPES.short(c) + '<path d="M73 20 Q92 24 87 46 Q82 42 77 30 Z" fill="' + c + '"/>';
+    },
+    afro: function (c) {
+      return '<path fill-rule="evenodd" d="' + circlePath(50, 36, 34) + circlePath(50, 36, 26) + '" fill="' + c + '"/>';
+    },
+    mohawk: function (c) {
+      return HAIR_SHAPES.buzz(c) + '<path d="M45 4 Q50 1 55 4 L57 30 Q50 25 43 30 Z" fill="' + c + '"/>';
+    }
+  };
+
+  function avatarSVG(p) {
+    var hairFn = HAIR_SHAPES[p.hair] || HAIR_SHAPES.short;
+    var glasses = p.glasses
+      ? '<g fill="none" stroke="#241d3d" stroke-width="2.4"><circle cx="40" cy="41" r="8.5"/><circle cx="60" cy="41" r="8.5"/><line x1="48.5" y1="41" x2="51.5" y2="41"/></g>'
+      : "";
+    var facial = p.facialHair === "mustache"
+      ? '<path d="M39 56 Q50 61 61 56 Q50 58.5 39 56Z" fill="' + p.hairColor + '"/>'
+      : p.facialHair === "beard"
+        ? '<path d="M27 46 Q26 72 50 78 Q74 72 73 46 Q67 60 50 62 Q33 60 27 46Z" fill="' + p.hairColor + '" opacity="0.92"/>'
+        : "";
+    var earrings = p.earrings
+      ? '<circle cx="24" cy="47" r="2.3" fill="#f2c14e"/><circle cx="76" cy="47" r="2.3" fill="#f2c14e"/>'
+      : "";
+    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">' +
+      '<rect width="100" height="100" fill="' + p.bg + '"/>' +
+      '<path d="M17 100 Q17 70 50 68 Q83 70 83 100 Z" fill="' + p.shirt + '"/>' +
+      '<rect x="41" y="56" width="18" height="22" rx="7" fill="' + p.skin + '"/>' +
+      '<circle cx="25" cy="44" r="5" fill="' + p.skin + '"/>' +
+      '<circle cx="75" cy="44" r="5" fill="' + p.skin + '"/>' +
+      '<circle cx="50" cy="40" r="25" fill="' + p.skin + '"/>' +
+      earrings + facial +
+      '<path d="M35 30 Q41 26 47 29" fill="none" stroke="' + p.hairColor + '" stroke-width="2.2" stroke-linecap="round"/>' +
+      '<path d="M53 29 Q59 26 65 30" fill="none" stroke="' + p.hairColor + '" stroke-width="2.2" stroke-linecap="round"/>' +
+      '<ellipse cx="41" cy="39" rx="2.6" ry="3.2" fill="#241d3d"/>' +
+      '<ellipse cx="59" cy="39" rx="2.6" ry="3.2" fill="#241d3d"/>' +
+      '<path d="M42 50 Q50 55 58 50" fill="none" stroke="#8a5a3f" stroke-width="2.2" stroke-linecap="round" opacity="0.6"/>' +
+      glasses +
+      hairFn(p.hairColor) +
+      "</svg>";
+  }
+
+  /* ================= FURNITURE / OBJECT ICONS ================= */
+  function shadowEllipse() { return '<ellipse cx="50" cy="93" rx="32" ry="5.5" fill="rgba(20,14,40,0.22)"/>'; }
+
+  var FURNITURE_SHAPES = {
+    ventana: function () {
+      return '<rect x="16" y="8" width="68" height="78" rx="5" fill="#8a5a34" stroke="#4a2f1c" stroke-width="2"/>' +
+        '<rect x="23" y="15" width="54" height="64" rx="2" fill="#bfe6f7"/>' +
+        '<rect x="23" y="15" width="54" height="26" fill="#e7f5fc" opacity="0.55"/>' +
+        '<line x1="50" y1="15" x2="50" y2="79" stroke="#8a5a34" stroke-width="3.4"/>' +
+        '<line x1="23" y1="47" x2="77" y2="47" stroke="#8a5a34" stroke-width="3.4"/>' +
+        '<path d="M12 10 Q2 8 4 26 L6 58 Q3 30 12 22Z" fill="#e8b4c9"/>' +
+        '<path d="M88 10 Q98 8 96 26 L94 58 Q97 30 88 22Z" fill="#e8b4c9"/>';
+    },
+    cama: function () {
+      return '<rect x="12" y="52" width="76" height="30" rx="6" fill="#c0392b"/>' +
+        '<rect x="12" y="52" width="76" height="10" rx="4" fill="#e8b4c9"/>' +
+        '<rect x="10" y="30" width="14" height="52" rx="4" fill="#6b4326"/>' +
+        '<rect x="16" y="34" width="46" height="20" rx="6" fill="#fbf9ff"/>' +
+        '<rect x="10" y="78" width="80" height="6" rx="2" fill="#4a2f1c"/>' +
+        shadowEllipse();
+    },
+    sofa: function () {
+      return '<rect x="14" y="46" width="72" height="14" rx="6" fill="#2471a3"/>' +
+        '<rect x="14" y="30" width="72" height="24" rx="10" fill="#2f8fce"/>' +
+        '<rect x="10" y="34" width="14" height="42" rx="6" fill="#2471a3"/>' +
+        '<rect x="76" y="34" width="14" height="42" rx="6" fill="#2471a3"/>' +
+        '<rect x="26" y="56" width="20" height="16" rx="5" fill="#7fc4ee"/>' +
+        '<rect x="54" y="56" width="20" height="16" rx="5" fill="#7fc4ee"/>' +
+        '<rect x="16" y="76" width="8" height="10" rx="2" fill="#4a2f1c"/>' +
+        '<rect x="76" y="76" width="8" height="10" rx="2" fill="#4a2f1c"/>' +
+        shadowEllipse();
+    },
+    planta: function () {
+      return '<path d="M32 62 L68 62 L62 90 L38 90 Z" fill="#ca6f1e"/>' +
+        '<rect x="30" y="56" width="40" height="9" rx="3" fill="#8a4a17"/>' +
+        '<path d="M50 58 Q30 40 34 14 Q52 30 50 58Z" fill="#1e8449"/>' +
+        '<path d="M50 58 Q70 40 66 14 Q48 30 50 58Z" fill="#28a05a"/>' +
+        '<path d="M50 58 Q46 30 50 10 Q54 30 50 58Z" fill="#33c79a"/>' +
+        shadowEllipse();
+    },
+    tv: function () {
+      return '<rect x="14" y="16" width="72" height="46" rx="5" fill="#1c1c1c"/>' +
+        '<rect x="20" y="21" width="60" height="36" rx="2" fill="#5fc9e8"/>' +
+        '<path d="M30 30 L50 45 L30 50Z" fill="#fbf9ff" opacity="0.85"/>' +
+        '<rect x="42" y="62" width="16" height="10" fill="#333"/>' +
+        '<rect x="26" y="72" width="48" height="6" rx="3" fill="#1c1c1c"/>' +
+        shadowEllipse();
+    },
+    silla: function () {
+      return '<rect x="30" y="10" width="34" height="34" rx="4" fill="#ca6f1e"/>' +
+        '<rect x="26" y="42" width="42" height="10" rx="3" fill="#8a4a17"/>' +
+        '<rect x="30" y="52" width="8" height="30" fill="#6b4326"/>' +
+        '<rect x="58" y="52" width="8" height="30" fill="#6b4326"/>' +
+        '<rect x="30" y="70" width="36" height="5" fill="#4a2f1c"/>' +
+        shadowEllipse();
+    },
+    espejo: function () {
+      return '<ellipse cx="50" cy="42" rx="28" ry="34" fill="#8e44ad"/>' +
+        '<ellipse cx="50" cy="42" rx="21" ry="27" fill="#e6d6f0"/>' +
+        '<path d="M38 22 Q46 18 52 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity="0.7"/>' +
+        '<rect x="46" y="74" width="8" height="14" fill="#5c2d73"/>' +
+        '<rect x="36" y="86" width="28" height="5" rx="2" fill="#4a2361"/>' +
+        shadowEllipse();
+    },
+    lampara: function () {
+      return '<circle cx="50" cy="24" r="18" fill="#f2c14e" opacity="0.35"/>' +
+        '<path d="M28 16 L72 16 L62 42 L38 42Z" fill="#b7950b"/>' +
+        '<rect x="47" y="42" width="6" height="36" fill="#6b4326"/>' +
+        '<ellipse cx="50" cy="80" rx="20" ry="6" fill="#4a2f1c"/>' +
+        '<ellipse cx="50" cy="27" rx="12" ry="6" fill="#fbe28a"/>' +
+        shadowEllipse();
+    },
+    mesa: function () {
+      return '<ellipse cx="50" cy="40" rx="38" ry="16" fill="#ca6f1e"/>' +
+        '<ellipse cx="50" cy="37" rx="34" ry="13" fill="#e0954a"/>' +
+        '<rect x="44" y="46" width="12" height="34" fill="#8a4a17"/>' +
+        '<ellipse cx="50" cy="80" rx="22" ry="5" fill="#4a2f1c"/>' +
+        '<circle cx="40" cy="36" r="8" fill="#fbf9ff"/>' +
+        '<rect x="55" y="33" width="3" height="10" rx="1.5" fill="#8a8a8a"/>' +
+        shadowEllipse();
+    },
+    radio: function () {
+      return '<rect x="16" y="30" width="68" height="42" rx="10" fill="#c0392b"/>' +
+        '<circle cx="34" cy="51" r="13" fill="#8a1f18"/>' +
+        '<circle cx="34" cy="51" r="7" fill="#fbf9ff"/>' +
+        '<rect x="52" y="42" width="26" height="6" rx="3" fill="#f2c14e"/>' +
+        '<rect x="52" y="52" width="18" height="6" rx="3" fill="#f2c14e"/>' +
+        '<path d="M26 30 L20 10 M74 30 L80 10" stroke="#4a2f1c" stroke-width="3" stroke-linecap="round"/>' +
+        shadowEllipse();
+    },
+    libro: function () {
+      return '<rect x="12" y="18" width="76" height="64" rx="4" fill="#8a5a34"/>' +
+        '<rect x="18" y="24" width="10" height="52" fill="#c0392b"/>' +
+        '<rect x="30" y="24" width="10" height="52" fill="#2471a3"/>' +
+        '<rect x="42" y="24" width="10" height="52" fill="#1e8449"/>' +
+        '<rect x="54" y="24" width="10" height="52" fill="#b7950b"/>' +
+        '<rect x="66" y="24" width="10" height="52" fill="#8e44ad"/>' +
+        shadowEllipse();
+    },
+    cafe: function () {
+      return '<ellipse cx="50" cy="70" rx="30" ry="7" fill="#8a5a34"/>' +
+        '<path d="M28 34 L72 34 L67 66 Q50 72 33 66Z" fill="#fbf9ff"/>' +
+        '<ellipse cx="50" cy="34" rx="22" ry="6" fill="#4a2f1c"/>' +
+        '<path d="M72 40 Q90 42 84 58 Q78 62 70 56" fill="none" stroke="#fbf9ff" stroke-width="5" stroke-linecap="round"/>' +
+        '<path d="M42 20 Q38 14 42 8" fill="none" stroke="#cfcfcf" stroke-width="3" stroke-linecap="round" opacity="0.8"/>' +
+        '<path d="M56 20 Q52 14 56 8" fill="none" stroke="#cfcfcf" stroke-width="3" stroke-linecap="round" opacity="0.8"/>' +
+        shadowEllipse();
+    },
+    ducha: function () {
+      return '<rect x="60" y="8" width="8" height="26" fill="#8a8a8a"/>' +
+        '<path d="M40 8 Q68 8 68 26 L34 26 Q34 8 40 8Z" fill="#9aa5ad"/>' +
+        '<ellipse cx="51" cy="26" rx="17" ry="4" fill="#7a848c"/>' +
+        '<circle cx="38" cy="40" r="2.4" fill="#7fc4ee"/><circle cx="47" cy="44" r="2.4" fill="#7fc4ee"/>' +
+        '<circle cx="56" cy="40" r="2.4" fill="#7fc4ee"/><circle cx="65" cy="44" r="2.4" fill="#7fc4ee"/>' +
+        '<circle cx="42" cy="54" r="2.4" fill="#7fc4ee"/><circle cx="60" cy="54" r="2.4" fill="#7fc4ee"/>' +
+        '<circle cx="51" cy="60" r="2.4" fill="#7fc4ee"/>' +
+        shadowEllipse();
+    },
+    cuadro: function () {
+      return '<rect x="14" y="10" width="72" height="60" rx="3" fill="#b7950b"/>' +
+        '<rect x="21" y="17" width="58" height="46" fill="#e6d6b0"/>' +
+        '<path d="M21 55 L40 32 L54 48 L64 36 L79 55 Z" fill="#2471a3"/>' +
+        '<circle cx="66" cy="27" r="6" fill="#f2c14e"/>' +
+        '<rect x="46" y="78" width="8" height="8" fill="#4a2f1c"/>' +
+        shadowEllipse();
+    },
+    chimenea: function () {
+      return '<rect x="10" y="10" width="80" height="70" rx="4" fill="#8a5a34"/>' +
+        '<rect x="20" y="18" width="60" height="10" rx="2" fill="#6b4326"/>' +
+        '<path d="M28 30 Q28 68 50 68 Q72 68 72 30Z" fill="#241d3d"/>' +
+        '<path d="M42 62 Q40 48 48 40 Q46 52 52 50 Q56 40 50 30 Q64 42 58 58 Q62 54 62 48 Q66 60 56 66 Q48 70 42 62Z" fill="#f2c14e"/>' +
+        '<path d="M46 60 Q46 50 52 44 Q50 54 56 52 Q54 60 48 62Z" fill="#c0392b"/>' +
+        shadowEllipse();
+    },
+    piano: function () {
+      return '<rect x="14" y="16" width="72" height="40" rx="4" fill="#241d3d"/>' +
+        '<rect x="14" y="56" width="72" height="14" fill="#1c1730"/>' +
+        '<rect x="20" y="60" width="60" height="8" fill="#fbf9ff"/>' +
+        '<rect x="22" y="60" width="4" height="8" fill="#1c1730"/><rect x="30" y="60" width="4" height="8" fill="#1c1730"/>' +
+        '<rect x="38" y="60" width="4" height="8" fill="#1c1730"/><rect x="46" y="60" width="4" height="8" fill="#1c1730"/>' +
+        '<rect x="54" y="60" width="4" height="8" fill="#1c1730"/><rect x="62" y="60" width="4" height="8" fill="#1c1730"/>' +
+        '<rect x="70" y="60" width="4" height="8" fill="#1c1730"/>' +
+        '<rect x="10" y="70" width="10" height="14" fill="#1c1730"/><rect x="80" y="70" width="10" height="14" fill="#1c1730"/>' +
+        shadowEllipse();
+    },
+    maleta: function () {
+      return '<path d="M40 22 L60 22 L60 14 L40 14Z" fill="none" stroke="#4a2f1c" stroke-width="3"/>' +
+        '<rect x="16" y="24" width="68" height="52" rx="8" fill="#ca6f1e"/>' +
+        '<rect x="16" y="24" width="68" height="52" rx="8" fill="none" stroke="#8a4a17" stroke-width="3"/>' +
+        '<rect x="16" y="46" width="68" height="8" fill="#8a4a17"/>' +
+        '<rect x="26" y="30" width="6" height="40" fill="#8a4a17"/>' +
+        '<rect x="68" y="30" width="6" height="40" fill="#8a4a17"/>' +
+        shadowEllipse();
+    },
+    guitarra: function () {
+      return '<circle cx="42" cy="62" r="24" fill="#ca6f1e"/>' +
+        '<circle cx="42" cy="62" r="24" fill="none" stroke="#8a4a17" stroke-width="3"/>' +
+        '<circle cx="58" cy="40" r="15" fill="#e0954a"/>' +
+        '<circle cx="42" cy="62" r="9" fill="#4a2f1c"/>' +
+        '<rect x="52" y="8" width="10" height="36" rx="3" fill="#6b4326" transform="rotate(18 57 26)"/>' +
+        '<circle cx="70" cy="12" r="4" fill="#f2c14e"/>' +
+        '<line x1="35" y1="30" x2="60" y2="90" stroke="#241d3d" stroke-width="1.4"/>' +
+        '<line x1="42" y1="28" x2="65" y2="90" stroke="#241d3d" stroke-width="1.4"/>' +
+        shadowEllipse();
+    },
+    sanitario: function () {
+      return '<rect x="34" y="8" width="32" height="24" rx="4" fill="#e8eef2"/>' +
+        '<rect x="34" y="8" width="32" height="24" rx="4" fill="none" stroke="#b9c4cc" stroke-width="2.4"/>' +
+        '<circle cx="58" cy="14" r="3" fill="#8a97a1"/>' +
+        '<path d="M26 34 L74 34 L70 52 Q70 66 50 70 Q30 66 30 52Z" fill="#f4f8fa"/>' +
+        '<path d="M26 34 L74 34 L70 52 Q70 66 50 70 Q30 66 30 52Z" fill="none" stroke="#c3ccd3" stroke-width="2.4"/>' +
+        '<ellipse cx="50" cy="41" rx="16" ry="7" fill="#cfe6f2"/>' +
+        shadowEllipse();
+    },
+    lavadora: function () {
+      return '<rect x="16" y="10" width="68" height="76" rx="6" fill="#e3e7ea"/>' +
+        '<rect x="16" y="10" width="68" height="76" rx="6" fill="none" stroke="#b9c4cc" stroke-width="2"/>' +
+        '<rect x="16" y="10" width="68" height="15" rx="6" fill="#c7ced4"/>' +
+        '<circle cx="27" cy="17" r="2.6" fill="#8a97a1"/>' +
+        '<circle cx="38" cy="17" r="2.6" fill="#8a97a1"/>' +
+        '<circle cx="50" cy="54" r="24" fill="#aebac2"/>' +
+        '<circle cx="50" cy="54" r="19" fill="#7fc4ee"/>' +
+        '<circle cx="50" cy="54" r="19" fill="none" stroke="#5b98c4" stroke-width="3"/>' +
+        '<circle cx="50" cy="54" r="9" fill="#bfe6f7" opacity="0.75"/>' +
+        shadowEllipse();
+    }
+  };
+
+  function furnitureSVG(id) {
+    var fn = FURNITURE_SHAPES[id];
+    if (!fn) return "";
+    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">' + fn() + "</svg>";
+  }
+
+  /* ================= STATE ================= */
+  var state = {
+    kase: null, selectedSuspectIdx: null,
+    hintsUsed: 0, moves: 0, mistakes: 0, startTime: null, timerHandle: null, solved: false, caseNumber: 1,
+    verdictInfo: null, history: [], projectorMode: false, progress: null
+  };
+
+  // Elementos del tablero: se enlazan una sola vez (bindGameElements) al
+  // cargar la página, porque ahora viven en este mismo documento — la
+  // sección #game-section empieza oculta y se muestra sin reconstruir nada.
+  var boardEl, rosterEl, statusPill, scenarioTitle, scenarioSub, difficultyLabel,
+    caseCounter, statPlaced, statCorrect, statTime, statMoves, statMistakes, hintCountEl, btnHint,
+    accuseCard, accuseNote, accuseOptions, verdictEl, verdictStamp, verdictText, liveRegion,
+    btnUndo, gameWrap, solveExplainEl, gameSection, configSection;
+  var bubbleVictim = document.getElementById("bubble-victim");
+
+  /* ================= TABLERO DE JUEGO ================= */
+
+  // Enlaza los elementos del tablero (una sola vez, al cargar la página).
+  function bindGameElements() {
+    boardEl = document.getElementById("board");
+    rosterEl = document.getElementById("roster-list");
+    statusPill = document.getElementById("status-pill");
+    scenarioTitle = document.getElementById("scenario-title");
+    scenarioSub = document.getElementById("scenario-sub");
+    difficultyLabel = document.getElementById("difficulty-label");
+    caseCounter = document.getElementById("case-counter");
+    statPlaced = document.getElementById("stat-placed");
+    statCorrect = document.getElementById("stat-correct");
+    statTime = document.getElementById("stat-time");
+    statMoves = document.getElementById("stat-moves");
+    statMistakes = document.getElementById("stat-mistakes");
+    hintCountEl = document.getElementById("hint-count");
+    btnHint = document.getElementById("btn-hint");
+    accuseCard = document.getElementById("accuse-card");
+    accuseNote = document.getElementById("accuse-note");
+    accuseOptions = document.getElementById("accuse-options");
+    verdictEl = document.getElementById("verdict");
+    verdictStamp = document.getElementById("verdict-stamp");
+    verdictText = document.getElementById("verdict-text");
+    liveRegion = document.getElementById("live-region");
+    btnUndo = document.getElementById("btn-undo");
+    solveExplainEl = document.getElementById("solve-explain");
+    gameSection = document.getElementById("game-section");
+    configSection = document.getElementById("config-section");
+    gameWrap = gameSection;
+  }
+
+  function bindGameEvents() {
+    document.getElementById("btn-new").addEventListener("click", function () {
+      if (state.kase && !state.solved && state.moves > 0) {
+        showConfirm(document, "Empezar un caso nuevo", "Perderás el progreso del caso actual (movimientos, pistas y errores). ¿Quieres continuar?", function () { newCase(false); });
+      } else {
+        newCase(false);
+      }
+    });
+    document.getElementById("btn-reset").addEventListener("click", function () {
+      if (!state.solved && state.moves > 0) {
+        showConfirm(document, "Reiniciar este caso", "Perderás los movimientos, pistas y errores registrados hasta ahora en este caso. ¿Quieres continuar?", resetCase);
+      } else {
+        resetCase();
+      }
+    });
+    btnHint.addEventListener("click", useHint);
+    btnUndo.addEventListener("click", undoLastMove);
+    document.getElementById("btn-back-config").addEventListener("click", backToConfig);
+    document.getElementById("btn-help").addEventListener("click", openTutorial);
+    document.getElementById("tutorial-prev").addEventListener("click", function () {
+      if (tutorialStepIdx > 0) { tutorialStepIdx--; renderTutorialStep(); }
+    });
+    document.getElementById("tutorial-next").addEventListener("click", function () {
+      if (tutorialStepIdx < TUTORIAL_STEPS.length - 1) { tutorialStepIdx++; renderTutorialStep(); }
+      else { closeTutorial(); }
+    });
+  }
+
+  // Botón "Empezar a jugar" y las pestañas de dificultad comparten esta
+  // función. forceLevel truthy = siempre arma un caso nuevo de ese nivel
+  // (clic en una pestaña). forceLevel null = solo muestra el tablero,
+  // conservando el caso en curso si ya existía uno — el tablero vive en
+  // esta misma página, así que nunca hay que "reconstruirlo": basta con
+  // quitarle el atributo hidden y hacer scroll hasta él.
+  function showGame() {
+    if (!state.kase) newCase(true);
+    var firstReveal = gameSection.hidden;
+    if (configSection) configSection.hidden = true;
+    gameSection.hidden = false;
+    if (firstReveal) maybeShowTutorial();
+    updateLaunchStatus();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Botón "⬅️ Volver a la configuración" del tablero: no borra nada del
+  // caso en curso (el estado sigue en memoria), solo cambia qué sección se
+  // ve — así se puede volver a jugar donde se quedó con "Ir al tablero".
+  function backToConfig() {
+    gameSection.hidden = true;
+    if (configSection) configSection.hidden = false;
+    updateLaunchStatus();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function updateLaunchStatus() {
+    var statusEl = document.getElementById("game-window-status");
+    var btn = document.getElementById("btn-open-game");
+    if (!statusEl || !btn) return;
+    if (state.kase) {
+      statusEl.textContent = "🟢 Tienes una partida en curso — el tablero está más abajo, en esta misma página.";
+      btn.textContent = "🎮 Ir al tablero";
+    } else {
+      statusEl.textContent = "Toca el botón para empezar tu próximo caso.";
+      btn.textContent = "🎮 Empezar a jugar";
+    }
+  }
+
+  // Dificultad progresiva ÚNICA: no hay niveles para elegir — actualiza el
+  // panel que muestra cuántos personajes le tocan ahora al jugador
+  // registrado, cuántos casos ha resuelto y cuántos le faltan para el
+  // próximo personaje (o el aviso de que ya llegó al tope).
+  function updateProgressDisplay() {
+    var box = document.getElementById("progress-display");
+    if (!box) return;
+    var name = getPlayerName() || "Invitado";
+    var cfg = resolveProgress(name);
+    var pct = Math.round(((cfg.K - PROGRESSION.baseK) / (PROGRESSION.maxK - PROGRESSION.baseK)) * 100);
+    var nextText = cfg.maxed
+      ? "🏆 ¡Llegaste al tablero máximo! Sigue jugando para mejorar tu puntaje."
+      : "Faltan " + cfg.casesToNext + " caso" + (cfg.casesToNext === 1 ? "" : "s") + " para el próximo personaje.";
+    box.innerHTML =
+      '<div class="progress-row"><span>👥 ' + cfg.K + ' personajes ahora</span><span>🏆 ' + cfg.baseScore + ' pts por caso</span></div>' +
+      '<div class="progress-bar"><div class="progress-bar-fill" style="width:' + Math.min(100, Math.max(0, pct)) + '%;"></div></div>' +
+      '<p class="hint-note" style="margin-top:6px;">Casos resueltos: ' + cfg.count + ' · ' + nextText + '</p>';
+  }
+
+  function newCase(isFirst) {
+    var playerName = getPlayerName() || "Invitado";
+    var cfg = resolveProgress(playerName);
+    stopTimer();
+    state.progress = cfg;
+    var kase = null;
+    for (var attempt = 0; attempt < 400 && !kase; attempt++) kase = generateCase(cfg);
+    state.kase = kase;
+    resetProgressState();
+    if (!isFirst) state.caseNumber++;
+    refreshCaseUI();
+    updateProgressDisplay();
+  }
+
+  // Reinicia el progreso de UN caso (movimientos, pistas, errores...) sin
+  // tocar el caso mismo, sin regenerarlo. No confundir con el progreso
+  // general del jugador (resolveProgress), que se calcula a partir de los
+  // casos guardados en el marcador.
+  function resetProgressState() {
+    state.selectedSuspectIdx = null;
+    state.hintsUsed = 0;
+    state.moves = 0;
+    state.mistakes = 0;
+    state.startTime = null;
+    state.solved = false;
+    state.verdictInfo = null;
+    state.history = [];
+  }
+
+  // Vuelve a dibujar toda la interfaz del tablero a partir de state.kase.
+  function refreshCaseUI() {
+    var kase = state.kase;
+    caseCounter.textContent = "CASO N.º " + String(state.caseNumber).padStart(3, "0");
+    scenarioTitle.textContent = kase.scenario.title;
+    scenarioSub.textContent = kase.scenario.sub;
+    difficultyLabel.textContent = kase.K + " personajes";
+    var victimName = CHARACTERS[kase.victimCharIdx].name;
+    bubbleVictim.textContent = "¡" + victimName + " fue asesinado(a)! ¿Puedes descubrir quién fue? Lee la pista de cada sospechoso y encuentra su ubicación exacta en la escena. El asesino estaba a solas con la víctima, en la misma habitación.";
+
+    renderRoster();
+    renderBoard();
+    updateStats();
+    updateHintUI();
+    updateUndoUI();
+    btnHint.disabled = false;
+    accuseCard.classList.remove("ready");
+    verdictEl.classList.remove("show", "win");
+    if (solveExplainEl) solveExplainEl.innerHTML = "";
+    statusPill.textContent = "Selecciona un sospechoso y toca una casilla junto a su objeto";
+    updateLaunchStatus();
+  }
+
+
+  function renderRoster() {
+    rosterEl.innerHTML = "";
+    var bubbleColors = ["var(--pink)", "var(--lavender)", "var(--blue)", "var(--mint)"];
+    var bubbleInks = ["var(--pink-ink)", "var(--lavender-ink)", "var(--blue-ink)", "var(--mint-ink)"];
+    state.kase.suspects.forEach(function (sus, i) {
+      var ch = CHARACTERS[sus.charIdx];
+      var row = document.createElement("button");
+      row.type = "button";
+      row.className = "suspect-row";
+      row.dataset.i = i;
+      row.innerHTML =
+        '<div class="polaroid"><div class="photo">' + avatarSVG(ch.avatar) + '</div>' +
+        '<div class="name-tag">' + ch.name + '</div></div>' +
+        '<div class="clue-bubble" style="background:' + bubbleColors[i % 4] + ';color:' + bubbleInks[i % 4] + '">' +
+        '<div class="cb-name">' + ch.name + '<span class="cb-tick"></span></div>' +
+        '<div class="cb-clue">' + sus.clue + '</div></div>';
+      row.addEventListener("click", function () { onSuspectCardClick(i); });
+      rosterEl.appendChild(row);
+    });
+    refreshRosterVisuals();
+  }
+
+  // Regla "coloca a la persona donde quieras": ya no hay una única casilla
+  // "correcta" por sospechoso, sino un conjunto de casillas válidas alrededor
+  // de su mueble (o su única casilla de habitación, si su pista es de cuarto).
+  function isSuspectCorrect(sus) {
+    return sus.placedCell !== null && sus.candidateCells.indexOf(sus.placedCell) !== -1;
+  }
+
+  function refreshRosterVisuals() {
+    var rows = rosterEl.children;
+    for (var i = 0; i < rows.length; i++) {
+      var sus = state.kase.suspects[i];
+      var row = rows[i];
+      row.classList.toggle("selected", state.selectedSuspectIdx === i);
+      var correct = isSuspectCorrect(sus);
+      row.classList.toggle("correct", correct);
+      var tick = row.querySelector(".cb-tick");
+      tick.textContent = correct ? "✅" : (sus.placedCell !== null ? "❌" : "");
+    }
+  }
+
+  function renderBoard() {
+    var kase = state.kase;
+    boardEl.style.gridTemplateColumns = "repeat(" + kase.cols + ", 1fr)";
+    boardEl.style.gridTemplateRows = "repeat(" + kase.rows + ", 1fr)";
+    boardEl.innerHTML = "";
+    var significantSet = {};
+    kase.standCandidates.forEach(function (c) { significantSet[c] = true; });
+    significantSet[kase.victimCell] = true;
+
+    var roomLabelCell = {};
+    for (var idx = 0; idx < kase.regionOf.length; idx++) {
+      var rm = kase.regionOf[idx];
+      if (roomLabelCell[rm] === undefined) roomLabelCell[rm] = idx;
+    }
+
+    for (var r = 0; r < kase.rows; r++) {
+      for (var c = 0; c < kase.cols; c++) {
+        var i = r * kase.cols + c;
+        var region = kase.regionOf[i];
+        var cell = document.createElement("div");
+        cell.className = "cell";
+        cell.dataset.idx = i;
+        cell.style.background = roomBackground(region);
+
+        var up = r > 0 ? kase.regionOf[i - kase.cols] : null;
+        var down = r < kase.rows - 1 ? kase.regionOf[i + kase.cols] : null;
+        var left = c > 0 ? kase.regionOf[i - 1] : null;
+        var right = c < kase.cols - 1 ? kase.regionOf[i + 1] : null;
+        cell.style.borderTopWidth = (up === null || up !== region) ? "2px" : "0.5px";
+        cell.style.borderBottomWidth = (down === null || down !== region) ? "2px" : "0.5px";
+        cell.style.borderLeftWidth = (left === null || left !== region) ? "2px" : "0.5px";
+        cell.style.borderRightWidth = (right === null || right !== region) ? "2px" : "0.5px";
+
+        if (roomLabelCell[region] === i) {
+          var tag = document.createElement("div");
+          tag.className = "room-tag";
+          tag.textContent = kase.roomMeta[region].name;
+          cell.appendChild(tag);
+        }
+
+        if (significantSet[i]) {
+          cell.classList.add("significant");
+          cell.setAttribute("role", "gridcell");
+          cell.setAttribute("tabindex", "0");
+          cell.addEventListener("click", function () { onCellClick(Number(this.dataset.idx)); });
+          cell.addEventListener("keydown", function (ev) {
+            if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); onCellClick(Number(this.dataset.idx)); }
+          });
+        }
+        boardEl.appendChild(cell);
+      }
+    }
+    paintBoardContents();
+  }
+
+  function paintBoardContents() {
+    var kase = state.kase;
+    var cells = boardEl.children;
+    for (var i = 0; i < cells.length; i++) {
+      var el = cells[i];
+      var tag = el.querySelector(".room-tag");
+      el.innerHTML = "";
+      if (tag) el.appendChild(tag);
+      el.classList.remove("occupied", "correct", "wrong", "victim-reveal");
+    }
+    kase.suspects.forEach(function (sus) {
+      if (sus.landmarkCell === null) return;
+      var el = cells[sus.landmarkCell];
+      var furn = document.createElement("div");
+      furn.className = "furniture-icon";
+      furn.innerHTML = furnitureSVG(sus.featureId);
+      el.appendChild(furn);
+    });
+    var occupiedCells = {};
+    kase.suspects.forEach(function (sus) {
+      if (sus.placedCell === null) return;
+      occupiedCells[sus.placedCell] = true;
+      var el = cells[sus.placedCell];
+      var ch = CHARACTERS[sus.charIdx];
+      var correct = isSuspectCorrect(sus);
+      el.classList.add("occupied", correct ? "correct" : "wrong");
+      var av = document.createElement("div");
+      av.className = "avatar";
+      av.innerHTML = avatarSVG(ch.avatar);
+      el.appendChild(av);
+    });
+
+    // Regla "una persona por fila y columna": cualquier casilla vacía que
+    // comparta fila o columna con un sospechoso ya ubicado queda bloqueada.
+    // El resto de casillas alrededor de cada mueble quedan libres para que el
+    // jugador decida dónde pararlo: puede elegir cualquiera de ellas.
+    var blockedRows = {}, blockedCols = {};
+    kase.suspects.forEach(function (sus) {
+      if (sus.placedCell === null) return;
+      blockedRows[Math.floor(sus.placedCell / kase.cols)] = true;
+      blockedCols[sus.placedCell % kase.cols] = true;
+    });
+    kase.standCandidates.forEach(function (cellIdx) {
+      if (occupiedCells[cellIdx]) return;
+      var r = Math.floor(cellIdx / kase.cols), c = cellIdx % kase.cols;
+      if (blockedRows[r] || blockedCols[c]) {
+        var el = cells[cellIdx];
+        el.classList.add("blocked");
+        el.setAttribute("title", "Esa fila o columna ya tiene a alguien ubicado");
+        var xmark = document.createElement("div");
+        xmark.className = "blocked-mark";
+        xmark.textContent = "✕";
+        el.appendChild(xmark);
+      }
+    });
+
+    if (allSuspectsCorrect()) {
+      var vEl = cells[kase.victimCell];
+      vEl.classList.add("victim-reveal");
+      var av2 = document.createElement("div");
+      av2.className = "avatar";
+      av2.textContent = "💀";
+      av2.style.background = "transparent";
+      av2.style.boxShadow = "none";
+      vEl.appendChild(av2);
+    }
+  }
+
+  function allSuspectsCorrect() {
+    var kase = state.kase;
+    return kase.suspects.every(isSuspectCorrect);
+  }
+
+  function onSuspectCardClick(i) {
+    var sus = state.kase.suspects[i];
+    state.selectedSuspectIdx = (state.selectedSuspectIdx === i) ? null : i;
+    refreshRosterVisuals();
+    statusPill.textContent = state.selectedSuspectIdx === null
+      ? "Selecciona un sospechoso y toca una casilla junto a su objeto"
+      : "Toca la casilla donde crees que estaba " + CHARACTERS[sus.charIdx].name + ".";
+  }
+
+  function onCellClick(idx) {
+    if (state.solved) return;
+    var kase = state.kase;
+    var isSignificant = kase.standCandidates.indexOf(idx) !== -1 || idx === kase.victimCell;
+    if (!isSignificant) return;
+
+    var occupant = kase.suspects.filter(function (s) { return s.placedCell === idx; })[0];
+    if (occupant) {
+      var removedFrom = occupant.placedCell;
+      occupant.placedCell = null;
+      state.moves++;
+      state.selectedSuspectIdx = null;
+      state.history.push({ type: "remove", sus: occupant, prevCell: removedFrom });
+      renderBoard();
+      refreshRosterVisuals();
+      updateStats();
+      updateUndoUI();
+      checkSolved();
+      return;
+    }
+
+    if (state.selectedSuspectIdx === null) {
+      statusPill.textContent = "Primero elige un sospechoso de la lista.";
+      return;
+    }
+
+    var r = Math.floor(idx / kase.cols), c = idx % kase.cols;
+    var rowColTaken = kase.suspects.some(function (s) {
+      return s.placedCell !== null &&
+        (Math.floor(s.placedCell / kase.cols) === r || s.placedCell % kase.cols === c);
+    });
+    if (state.startTime === null) startTimer();
+    var sus = kase.suspects[state.selectedSuspectIdx];
+    state.selectedSuspectIdx = null;
+
+    if (rowColTaken) {
+      // También es un error de colocación: intentaste ubicar a alguien en una
+      // casilla que ya choca en fila/columna con otro sospechoso, así que no
+      // puede quedar ahí. Se descuentan puntos igual que cualquier otra
+      // casilla incorrecta, pero no se mueve a nadie.
+      state.mistakes++;
+      state.moves++;
+      state.history.push({ type: "conflict" });
+      statusPill.textContent = "Esa fila o columna ya tiene otro sospechoso ubicado (−" + MISTAKE_PENALTY + " puntos). Quítalo primero.";
+      refreshRosterVisuals();
+      updateStats();
+      updateUndoUI();
+      return;
+    }
+
+    sus.placedCell = idx;
+    state.moves++;
+    // Regla de puntaje: cada vez que te equivocas al ubicar a alguien, se
+    // descuentan puntos (aparte de la penalización por pistas).
+    var placedOk = isSuspectCorrect(sus);
+    var mistakeAdded = false;
+    if (!placedOk) {
+      state.mistakes++;
+      mistakeAdded = true;
+      statusPill.textContent = "Esa no era la casilla correcta (−" + MISTAKE_PENALTY + " puntos). Puedes quitarlo y volver a intentar.";
+    } else {
+      statusPill.textContent = "¡Bien! Esa casilla es correcta.";
+    }
+    state.history.push({ type: "place", sus: sus, mistakeAdded: mistakeAdded });
+    renderBoard();
+    refreshRosterVisuals();
+    updateStats();
+    updateUndoUI();
+    checkSolved();
+  }
+
+  // Deshace la última acción registrada en state.history (colocar, un choque
+  // de fila/columna, quitar a alguien, o usar una pista), revirtiendo
+  // exactamente los puntos/movimientos que esa acción sumó.
+  function undoLastMove() {
+    if (state.solved || state.history.length === 0) return;
+    var last = state.history.pop();
+    var kase = state.kase;
+    if (last.type === "place") {
+      last.sus.placedCell = null;
+      state.moves--;
+      if (last.mistakeAdded) state.mistakes--;
+      statusPill.textContent = "Deshiciste esa colocación.";
+    } else if (last.type === "conflict") {
+      state.moves--;
+      state.mistakes--;
+      statusPill.textContent = "Deshiciste ese intento.";
+    } else if (last.type === "remove") {
+      last.sus.placedCell = last.prevCell;
+      state.moves--;
+      statusPill.textContent = "Volviste a poner a esa persona donde estaba.";
+    } else if (last.type === "hint") {
+      last.sus.placedCell = null;
+      state.hintsUsed--;
+      state.moves--;
+      last.displaced.forEach(function (d) { d.sus.placedCell = d.prevCell; });
+      updateHintUI();
+      btnHint.disabled = state.hintsUsed >= HINT_LIMIT;
+      statusPill.textContent = "Deshiciste esa pista.";
+    }
+    accuseCard.classList.remove("ready");
+    renderBoard();
+    refreshRosterVisuals();
+    updateStats();
+    updateUndoUI();
+  }
+
+  function updateUndoUI() {
+    if (!btnUndo) return;
+    btnUndo.disabled = state.solved || state.history.length === 0;
+  }
+
+  function updateStats() {
+    var kase = state.kase;
+    var placed = kase.suspects.filter(function (s) { return s.placedCell !== null; }).length;
+    var correct = kase.suspects.filter(isSuspectCorrect).length;
+    statPlaced.textContent = placed + " / " + kase.suspects.length;
+    statCorrect.textContent = String(correct);
+    statMoves.textContent = String(state.moves);
+    statMistakes.textContent = String(state.mistakes);
+  }
+
+  function checkSolved() {
+    if (allSuspectsCorrect()) {
+      stopTimer();
+      showAccusePanel();
+      statusPill.textContent = "¡Ubicaste a todos! El cuerpo apareció en la última casilla libre.";
+    } else {
+      accuseCard.classList.remove("ready");
+    }
+  }
+
+  function showAccusePanel() {
+    var kase = state.kase;
+    var victimRoom = kase.regionOf[kase.victimCell];
+    var roommate = kase.suspects.filter(function (s) {
+      return s.placedCell !== null && s.placedCell !== kase.victimCell && kase.regionOf[s.placedCell] === victimRoom;
+    })[0];
+    var roomMeta = kase.roomMeta[victimRoom];
+    accuseNote.textContent = "El cuerpo estaba en " + roomMeta.article + " " + roomMeta.name.toLowerCase() +
+      ". Revisa quién más estaba ahí y acusa.";
+    accuseOptions.innerHTML = "";
+    if (roommate) {
+      var ch = CHARACTERS[roommate.charIdx];
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "accuse-btn secondary";
+      btn.textContent = "Acusar a " + ch.name;
+      btn.addEventListener("click", function () { onAccuse(roommate); });
+      accuseOptions.appendChild(btn);
+    } else {
+      var p = document.createElement("p");
+      p.style.fontSize = "13px";
+      p.style.color = "var(--ink-soft)";
+      p.textContent = "Nadie más quedó en esa habitación. Revisa el tablero.";
+      accuseOptions.appendChild(p);
+    }
+    accuseCard.classList.add("ready");
+  }
+
+  function onAccuse(suspect) {
+    state.solved = true;
+    var kase = state.kase;
+    var ch = CHARACTERS[suspect.charIdx];
+    var victimCh = CHARACTERS[kase.victimCharIdx];
+    var isCorrect = suspect.isKiller;
+    verdictEl.classList.add("show");
+    verdictEl.classList.toggle("win", isCorrect);
+    verdictStamp.textContent = isCorrect ? "CASO CERRADO" : "CASO SIN RESOLVER";
+    var t = formatTime(elapsedSeconds());
+    var msg;
+    if (isCorrect) {
+      // Puntaje: 10 puntos por cada personaje del tablero (kase.K), -10 por
+      // cada pista usada, -5 por cada vez que se ubicó a alguien en una
+      // casilla incorrecta. El Top 10 de puntajes suma el puntaje de cada
+      // partida que juegue una misma persona (ver aggregateTotals).
+      var baseScore = kase.baseScore;
+      var hintDeduction = state.hintsUsed * HINT_PENALTY;
+      var mistakeDeduction = state.mistakes * MISTAKE_PENALTY;
+      var scoreEarned = Math.max(0, baseScore - hintDeduction - mistakeDeduction);
+      var playerName = getPlayerName() || "Invitado";
+      saveScoreRecord({
+        name: playerName, score: scoreEarned, people: kase.K,
+        hintsUsed: state.hintsUsed, mistakes: state.mistakes, moves: state.moves, seconds: elapsedSeconds(),
+        date: new Date().toISOString()
+      });
+      var noteParts = [];
+      if (state.hintsUsed > 0) noteParts.push(hintDeduction + " por " + state.hintsUsed + (state.hintsUsed === 1 ? " pista" : " pistas"));
+      if (state.mistakes > 0) noteParts.push(mistakeDeduction + " por " + state.mistakes + (state.mistakes === 1 ? " error" : " errores"));
+      var scoreNote = noteParts.length ? " (" + baseScore + " − " + noteParts.join(" − ") + ")" : "";
+      var totalNow = aggregateTotals().filter(function (r) { return r.name === playerName; })[0];
+      var totalNote = totalNow ? " Puntaje total acumulado de " + playerName + ": " + totalNow.total + " pts." : "";
+      msg = "¡Diste con el/la culpable! " + ch.name + " estaba en la misma habitación que " + victimCh.name +
+        ". Resuelto en " + state.moves + " movimientos y " + t + ". +" + scoreEarned + " puntos" + scoreNote + " para " + playerName + "." + totalNote;
+    } else {
+      msg = ch.name + " no fue. Vuelve a revisar las pistas antes de acusar de nuevo.";
+    }
+    verdictText.textContent = msg;
+    liveRegion.textContent = msg;
+    accuseOptions.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+    btnHint.disabled = true;
+    var explanationHTML = isCorrect ? buildSolutionExplanation() : "";
+    if (solveExplainEl) solveExplainEl.innerHTML = explanationHTML;
+    state.verdictInfo = { isCorrect: isCorrect, stamp: verdictStamp.textContent, msg: msg, explanationHTML: explanationHTML };
+    updateUndoUI();
+  }
+
+  // Arma el panel "Cómo se resolvió": para cada sospechoso explica qué decía
+  // su pista y por qué esa ubicación encajaba, reforzando el razonamiento
+  // deductivo (pensamiento computacional) detrás de la solución.
+  // "a" + "el" se contrae a "al" en español (junto al baño, no junto a el baño).
+  function junto(room) { return room.article === "el" ? "junto al " + room.name.toLowerCase() : "junto a " + room.article + " " + room.name.toLowerCase(); }
+  function buildSolutionExplanation() {
+    var kase = state.kase;
+    var victimName = CHARACTERS[kase.victimCharIdx].name;
+    var victimRoom = kase.roomMeta[kase.regionOf[kase.victimCell]];
+    var rows = kase.suspects.map(function (sus) {
+      var ch = CHARACTERS[sus.charIdx];
+      var room = kase.roomMeta[kase.regionOf[sus.landmarkCell]];
+      var placedRoom = sus.placedCell !== null ? kase.roomMeta[kase.regionOf[sus.placedCell]] : null;
+      var why;
+      if (sus.isKiller) {
+        why = "Su pista lo ubicaba " + junto(room) +
+          ", la misma habitación donde apareció " + victimName + " — por eso era el/la culpable.";
+      } else if (placedRoom) {
+        why = "Su pista lo ubicaba " + junto(room) +
+          ", así que la única casilla libre junto a ese mueble (sin chocar en fila/columna con nadie más) era la correcta.";
+      } else {
+        why = "Su pista lo ubicaba " + junto(room) + ".";
+      }
+      return '<li><strong>' + escapeHTML(ch.name) + '</strong>: "' + escapeHTML(sus.clue) + '" — ' + why + '</li>';
+    });
+    return '<h4>🧠 Cómo se resolvió</h4>' +
+      '<p>El cuerpo apareció en ' + victimRoom.article + ' ' + victimRoom.name.toLowerCase() +
+      '. Solo alguien podía compartir esa habitación sin romper ninguna pista:</p>' +
+      '<ol>' + rows.join("") + '</ol>';
+  }
+
+  function elapsedSeconds() { return state.startTime === null ? 0 : Math.floor((Date.now() - state.startTime) / 1000); }
+  function formatTime(total) {
+    var m = Math.floor(total / 60), s = total % 60;
+    return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+  }
+  function startTimer() {
+    state.startTime = Date.now();
+    statTime.textContent = "00:00";
+    state.timerHandle = window.setInterval(function () {
+      statTime.textContent = formatTime(elapsedSeconds());
+    }, 1000);
+  }
+  function stopTimer() { if (state.timerHandle) { window.clearInterval(state.timerHandle); state.timerHandle = null; } }
+
+  function updateHintUI() {
+    var left = HINT_LIMIT - state.hintsUsed;
+    hintCountEl.textContent = left > 0 ? (left + (left === 1 ? " pista disponible" : " pistas disponibles")) : "Sin pistas disponibles";
+  }
+
+  function useHint() {
+    if (state.solved || state.hintsUsed >= HINT_LIMIT) return;
+    var kase = state.kase;
+    var notYetCorrect = kase.suspects.filter(function (s) { return !isSuspectCorrect(s); });
+    if (notYetCorrect.length === 0) return;
+    if (state.startTime === null) startTimer();
+    var sus = notYetCorrect[Math.floor(Math.random() * notYetCorrect.length)];
+    // Como ahora cada quien puede estar en varias casillas alrededor de su
+    // mueble, es posible que otro sospechoso ya ubicado (bien o mal) comparta
+    // fila o columna con la casilla real de este — lo que rompería la regla
+    // "una persona por fila y columna". Lo desalojamos primero.
+    var hintRow = Math.floor(sus.correctCell / kase.cols), hintCol = sus.correctCell % kase.cols;
+    var displaced = [];
+    kase.suspects.forEach(function (other) {
+      if (other === sus || other.placedCell === null) return;
+      var otherRow = Math.floor(other.placedCell / kase.cols), otherCol = other.placedCell % kase.cols;
+      if (otherRow === hintRow || otherCol === hintCol) {
+        displaced.push({ sus: other, prevCell: other.placedCell });
+        other.placedCell = null;
+      }
+    });
+    sus.placedCell = sus.correctCell;
+    state.hintsUsed++;
+    state.moves++;
+    state.history.push({ type: "hint", sus: sus, displaced: displaced });
+    updateHintUI();
+    renderBoard();
+    refreshRosterVisuals();
+    updateStats();
+    updateUndoUI();
+    checkSolved();
+    if (state.hintsUsed >= HINT_LIMIT) btnHint.disabled = true;
+    statusPill.textContent = "Pista usada: " + CHARACTERS[sus.charIdx].name + " ya está en su lugar correcto.";
+  }
+
+  function resetCase() {
+    stopTimer();
+    state.kase.suspects.forEach(function (s) { s.placedCell = null; });
+    state.selectedSuspectIdx = null;
+    state.hintsUsed = 0;
+    state.moves = 0;
+    state.mistakes = 0;
+    state.startTime = null;
+    state.solved = false;
+    state.verdictInfo = null;
+    state.history = [];
+    renderBoard();
+    renderRoster();
+    updateStats();
+    updateHintUI();
+    updateUndoUI();
+    btnHint.disabled = false;
+    accuseCard.classList.remove("ready");
+    verdictEl.classList.remove("show", "win");
+    if (solveExplainEl) solveExplainEl.innerHTML = "";
+    statusPill.textContent = "Caso reiniciado. Selecciona un sospechoso y toca una casilla junto a su objeto.";
+  }
+
+  bindGameElements();
+  bindGameEvents();
+
+  document.getElementById("btn-open-game").addEventListener("click", function () {
+    showGame();
+  });
+
+  document.getElementById("btn-register").addEventListener("click", function () {
+    var input = document.getElementById("player-name-input");
+    var name = input.value.trim().slice(0, 24);
+    if (!name) { input.focus(); return; }
+    setPlayerName(name);
+    updatePlayerUI();
+    updateProgressDisplay();
+  });
+  document.getElementById("player-name-input").addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter") document.getElementById("btn-register").click();
+  });
+
+  document.getElementById("btn-export-scores-csv").addEventListener("click", function () { exportScoresCSV("score"); });
+  document.getElementById("btn-export-time-csv").addEventListener("click", function () { exportScoresCSV("time"); });
+  document.getElementById("btn-export-backup").addEventListener("click", exportScoresBackup);
+  document.getElementById("import-backup-input").addEventListener("change", function (ev) {
+    var file = ev.target.files && ev.target.files[0];
+    if (file) importScoresBackup(file);
+    ev.target.value = "";
+  });
+  document.getElementById("btn-reset-scores").addEventListener("click", resetScores);
+  document.getElementById("chk-projector-mode").addEventListener("change", function (ev) {
+    setProjectorMode(ev.target.checked);
+  });
+  document.getElementById("btn-print-case").addEventListener("click", printCurrentCase);
+
+  // Accesibilidad: alto contraste + tamaño de texto (persisten en este navegador)
+  document.getElementById("chk-high-contrast").addEventListener("change", function (ev) {
+    setHighContrast(ev.target.checked);
+  });
+  document.getElementById("btn-font-normal").addEventListener("click", function () { setFontSize("normal"); });
+  document.getElementById("btn-font-grande").addEventListener("click", function () { setFontSize("grande"); });
+  document.getElementById("btn-font-muy-grande").addEventListener("click", function () { setFontSize("muy-grande"); });
+
+  document.getElementById("chk-high-contrast").checked = loadHighContrast();
+  setHighContrast(loadHighContrast());
+  setFontSize(loadFontSize());
+
+  updateLaunchStatus();
+  updatePlayerUI();
+  renderLeaderboard();
+  renderTimeLeaderboard();
+  renderClassStats();
+  updateProgressDisplay();
+})();
+</script>
+</body>
+</html>
